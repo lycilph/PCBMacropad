@@ -5,3 +5,4 @@ Kicad resources (for keyboards)
 
 Tap drill chart (for self tapping screws into pla)
 * https://mae.ufl.edu/designlab/Lab%20Assignments/EML2322L%20Tap%20Drill%20Chart.pdf
+* From here: https://www.reddit.com/r/3dprinter/comments/fnlmps/hole_size_for_selftapping_screws/
