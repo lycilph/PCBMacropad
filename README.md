@@ -1,4 +1,7 @@
 # PCBMacropad
+
+Arduino pro micro pinout
+* https://learn.sparkfun.com/tutorials/pro-micro--fio-v3-hookup-guide/hardware-overview-pro-micro
  
 Kicad resources (for keyboards)
 * https://github.com/joe-scotto/scottokeebs/tree/main/Extras/ScottoKicad
