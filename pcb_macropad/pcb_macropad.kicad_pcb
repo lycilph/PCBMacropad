@@ -449,7 +449,7 @@
 	(footprint "ScottoKeebs_Components:OLED_128x32"
 		(layer "F.Cu")
 		(uuid "4074ef91-54b5-4036-88d0-42c8687af529")
-		(at 87.3125 89.69375)
+		(at 88.10625 89.69375)
 		(property "Reference" "J1"
 			(at 7.75 10 0)
 			(layer "F.SilkS")
@@ -1906,7 +1906,7 @@
 		(property "Reference" "REF**"
 			(at 0 -4.2 0)
 			(layer "F.SilkS")
-			(uuid "2cc4b898-b47b-417e-a86b-12719784f8ab")
+			(uuid "c60afeb7-6955-4805-8a06-280857aeea31")
 			(effects
 				(font
 					(size 1 1)
@@ -1917,7 +1917,7 @@
 		(property "Value" "MountingHole_3.2mm_M3"
 			(at 0 4.2 0)
 			(layer "F.Fab")
-			(uuid "40c4f7ab-d29e-4bf6-980c-b09a64c7b644")
+			(uuid "7ae6d2cd-d42e-4cf0-8613-f3eabe1cc612")
 			(effects
 				(font
 					(size 1 1)
@@ -1974,7 +1974,7 @@
 			)
 			(fill none)
 			(layer "Cmts.User")
-			(uuid "5b9e8426-1273-4747-8be1-326afa285bd0")
+			(uuid "b67f4eab-c723-4f9a-9bff-f579695edc02")
 		)
 		(fp_circle
 			(center 0 0)
@@ -1985,12 +1985,12 @@
 			)
 			(fill none)
 			(layer "F.CrtYd")
-			(uuid "b78ba8a9-cd2a-44ba-b726-c3ca3392ba26")
+			(uuid "c8bb3bb1-14e0-41a8-8175-b989db2a7818")
 		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
-			(uuid "b53e4e7f-c71d-44e2-979e-ae1d49b78d64")
+			(uuid "a9e82e67-a87f-413f-9e5d-9f259dc8120b")
 			(effects
 				(font
 					(size 1 1)
@@ -2003,7 +2003,7 @@
 			(size 3.2 3.2)
 			(drill 3.2)
 			(layers "F&B.Cu" "*.Mask")
-			(uuid "c22135f5-8eeb-412e-b669-bc6cded82226")
+			(uuid "15a6bf60-d0c5-41a5-af38-e5ec07c64809")
 		)
 	)
 	(footprint "ScottoKeebs_MX:MX_PCB_1.00u"
@@ -2350,7 +2350,7 @@
 		(property "Reference" "REF**"
 			(at 0 -4.2 0)
 			(layer "F.SilkS")
-			(uuid "2cc4b898-b47b-417e-a86b-12719784f8ab")
+			(uuid "6d6c89dd-be09-4757-8ab4-fd5bfc9c4135")
 			(effects
 				(font
 					(size 1 1)
@@ -2361,7 +2361,7 @@
 		(property "Value" "MountingHole_3.2mm_M3"
 			(at 0 4.2 0)
 			(layer "F.Fab")
-			(uuid "40c4f7ab-d29e-4bf6-980c-b09a64c7b644")
+			(uuid "c3ea5e57-3c32-4ae9-8155-164a66796aa4")
 			(effects
 				(font
 					(size 1 1)
@@ -2418,7 +2418,7 @@
 			)
 			(fill none)
 			(layer "Cmts.User")
-			(uuid "5b9e8426-1273-4747-8be1-326afa285bd0")
+			(uuid "789b3d2e-45d4-4ab9-8547-ebbb16d8c2f4")
 		)
 		(fp_circle
 			(center 0 0)
@@ -2429,12 +2429,12 @@
 			)
 			(fill none)
 			(layer "F.CrtYd")
-			(uuid "b78ba8a9-cd2a-44ba-b726-c3ca3392ba26")
+			(uuid "8cd1c2e7-d488-45d9-a3d3-0b3a5015df66")
 		)
 		(fp_text user "${REFERENCE}"
 			(at 0 0 0)
 			(layer "F.Fab")
-			(uuid "b53e4e7f-c71d-44e2-979e-ae1d49b78d64")
+			(uuid "c5d2b6e0-8b27-442a-81dc-61702dac8886")
 			(effects
 				(font
 					(size 1 1)
@@ -2447,7 +2447,7 @@
 			(size 3.2 3.2)
 			(drill 3.2)
 			(layers "F&B.Cu" "*.Mask")
-			(uuid "c22135f5-8eeb-412e-b669-bc6cded82226")
+			(uuid "e12d4341-f1db-455b-ae18-404d8c9b638d")
 		)
 	)
 	(footprint "ScottoKeebs_MX:MX_PCB_1.00u"
