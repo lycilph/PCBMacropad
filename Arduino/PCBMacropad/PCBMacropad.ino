@@ -56,6 +56,10 @@ String mappedKeys[numberOfLayers][ROWS][COLS] = {
 
 bool hasSlept = false;
 
+bool invertOled = false;
+unsigned long invertOledTimestamp;
+unsigned long invertOledDuration = 300L * 1000;
+
 void setup() {
   Serial.begin(9600); // Debug stuff
 
@@ -79,6 +83,8 @@ void setup() {
   eb1.setEncoderHandler(onEb1Encoder);
   eb1.setClickHandler(onEb1Click);
   eb1.setLongPressHandler(onEb1LongClick);
+
+  invertOledTimestamp = millis();
 
   // Sends a clean report to the host. This is important on any Arduino type.
   Keyboard.begin();
@@ -142,6 +148,9 @@ void ShowCurrentLayer()
   display.setCursor(99, 48);
   display.print(mappedKeys[currentLayer][2][2]);
 
+  // Invert display to prevent burn in
+  display.invertDisplay(invertOled);
+
   display.display();
 }
 
@@ -176,6 +185,15 @@ void loop() {
 
   // Call 'update' for every EncoderButton
   eb1.update();
+
+  // Check if the display should be inverted (to prevent burn in)
+  if (millis() - invertOledTimestamp >= invertOledDuration)
+  {
+    invertOled = !invertOled;
+    invertOledTimestamp = millis();
+
+    ShowCurrentLayer();
+  }
 
   // 'Update' the keypad (and check for pressed keys)
   if (keypad.getKeys())
