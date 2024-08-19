@@ -42,6 +42,8 @@ byte colPins[COLS] = {14, 16, 10}; //connect to the column pinouts of the keypad
 Keypad keypad = Keypad( makeKeymap(keys), colPins, rowPins, ROWS, COLS );
 unsigned long keyHeldTime[LIST_MAX]; // Keep a list of how long each key is held
 
+int mappedKeysXOffset = 12;
+int mappedKeysYOffset = 20;
 String mappedKeys[numberOfLayers][ROWS][COLS] = {
   {{"F13","F14","F15"},
   {"F16","F17","F18"},
@@ -121,31 +123,34 @@ void ShowCurrentLayer()
   // Clear the buffer
   display.clearDisplay();
   display.setTextSize(1); //height=9 pixels, width=5 pixels at textsize 1
-  display.setTextColor(WHITE);
   display.setRotation(2); //rotates text on OLED 1=90 degrees, 2=180 degrees
 
-  display.setCursor(0, 0);
+  display.fillRect(0, 0, 128, 13, WHITE);
+  display.setCursor(5, 2);
+  display.setTextColor(BLACK);
   display.print(layerStrBuffer);
+
+  display.setTextColor(WHITE);
   
-  display.setCursor(15, 16);
+  display.setCursor(mappedKeysXOffset, mappedKeysYOffset);
   display.print(mappedKeys[currentLayer][0][0]);
-  display.setCursor(57, 16);
+  display.setCursor(mappedKeysXOffset + 42, mappedKeysYOffset);
   display.print(mappedKeys[currentLayer][0][1]);
-  display.setCursor(99, 16);
+  display.setCursor(mappedKeysXOffset + 84, mappedKeysYOffset);
   display.print(mappedKeys[currentLayer][0][2]);
 
-  display.setCursor(15, 32);
+  display.setCursor(mappedKeysXOffset, mappedKeysYOffset + 16);
   display.print(mappedKeys[currentLayer][1][0]);
-  display.setCursor(57, 32);
+  display.setCursor(mappedKeysXOffset + 42, mappedKeysYOffset + 16);
   display.print(mappedKeys[currentLayer][1][1]);
-  display.setCursor(99, 32);
+  display.setCursor(mappedKeysXOffset + 84, mappedKeysYOffset + 16);
   display.print(mappedKeys[currentLayer][1][2]);
 
-  display.setCursor(15, 48);
+  display.setCursor(mappedKeysXOffset, mappedKeysYOffset + 32);
   display.print(mappedKeys[currentLayer][2][0]);
-  display.setCursor(57, 48);
+  display.setCursor(mappedKeysXOffset + 42, mappedKeysYOffset + 32);
   display.print(mappedKeys[currentLayer][2][1]);
-  display.setCursor(99, 48);
+  display.setCursor(mappedKeysXOffset + 84, mappedKeysYOffset + 32);
   display.print(mappedKeys[currentLayer][2][2]);
 
   // Invert display to prevent burn in
