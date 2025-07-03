@@ -7,6 +7,7 @@
              xmlns:local="clr-namespace:MacropadConfigurator"
              xmlns:vm="clr-namespace:MacropadConfigurator.ViewModels"
              xmlns:v="clr-namespace:MacropadConfigurator.Views"
+             xmlns:c="clr-namespace:MacropadConfigurator.Converters"
              mc:Ignorable="d"
              Startup="ApplicationStartup"
              Exit="ApplicationExit">
@@ -36,10 +37,19 @@
             
             <!-- Converters -->
             <BooleanToVisibilityConverter x:Key="bool_to_visibilty_converter"/>
+            <c:ShortcutConverter x:Key="shortcut_converter"/>
 
             <!-- Datatemplates -->
             <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
                 <v:SettingsView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type vm:ShortcutsViewModel}">
+                <v:ShortcutsView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type vm:ConfigurationViewModel}">
+                <v:ConfigurationView/>
             </DataTemplate>
         </ResourceDictionary>
     </Application.Resources>

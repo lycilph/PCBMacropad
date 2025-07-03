@@ -34,10 +34,12 @@ public partial class App : Application
         services.AddSingleton<SettingsService>();
 
         // These view models are singletons because they are used by multiple view models
-        services.AddSingleton<SettingsViewModel>();
 
         // Register view models
         services.AddTransient<MainViewModel>();
+        services.AddTransient<SettingsViewModel>();
+        services.AddTransient<ConfigurationViewModel>();
+        services.AddTransient<ShortcutsViewModel>();
 
         return services.BuildServiceProvider();
     }
@@ -54,6 +56,7 @@ public partial class App : Application
         notifyIcon = (TaskbarIcon)FindResource("NotifyIcon");
         notifyIcon.DataContext = new NotifyIconViewModel(this);
 
+        // Initialize main window
         var vm = Services.GetRequiredService<MainViewModel>();
         mainWindow = new MainWindow { DataContext = vm };
 
@@ -79,10 +82,5 @@ public partial class App : Application
     public void HideWindow()
     {
         mainWindow.Hide();
-    }
-
-    public void ExitApplication()
-    {
-        Shutdown();
     }
 }

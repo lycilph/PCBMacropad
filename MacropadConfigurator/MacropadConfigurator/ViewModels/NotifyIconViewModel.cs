@@ -14,6 +14,6 @@ public partial class NotifyIconViewModel(App app) : ObservableObject
     [RelayCommand]
     private void ExitApplication()
     {
-        app.ExitApplication();
+        app.Shutdown();
     }
 }

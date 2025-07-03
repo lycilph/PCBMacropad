@@ -33,13 +33,11 @@ public class SettingsService
     {
         var base_color_scheme = light ? Light : Dark;
         ThemeManager.Current.ChangeThemeBaseColor(App.Current, base_color_scheme);
-        Save();
     }
 
     public void SetColorScheme(string color_scheme)
     {
         ThemeManager.Current.ChangeThemeColorScheme(App.Current, color_scheme);
-        Save();
     }
 
     public string GetPath()
