@@ -1,13 +1,17 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using ControlzEx.Theming;
 using MacropadConfigurator.Extensions;
 using MacropadConfigurator.Services;
+using NLog;
 
 namespace MacropadConfigurator.ViewModels;
 
 public partial class SettingsViewModel : ObservableObject
 {
+    private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+
     private readonly SettingsService settings_service;
 
     [ObservableProperty]
@@ -32,4 +36,12 @@ public partial class SettingsViewModel : ObservableObject
 
     partial void OnIsLightChanged(bool value) => settings_service.SetBaseColorScheme(value);
     partial void OnSelectedApplicationColorChanged(Theme value) => settings_service.SetColorScheme(value.ColorScheme);
+
+    [RelayCommand]
+    public void Exit()
+    {
+        logger.Info("Shutting down from the main window");
+
+        App.Current.Shutdown();
+    }
 }

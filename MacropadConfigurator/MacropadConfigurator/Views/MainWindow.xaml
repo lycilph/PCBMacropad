@@ -46,8 +46,6 @@
     </mah:MetroWindow.Flyouts>
     
     <Grid>
-        <Button Content="Exit" Command="{Binding ExitCommand}" Width="100" Height="50" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-
         <Rectangle Fill="Gray"
                    Opacity="0.65"
                    Visibility="{Binding SettingsViewModel.IsOpen, Converter={StaticResource bool_to_visibilty_converter}}">

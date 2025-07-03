@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using Hardcodet.Wpf.TaskbarNotification;
 using MacropadConfigurator.Services;
 using MacropadConfigurator.ViewModels;
 using MacropadConfigurator.Views;
@@ -10,7 +11,11 @@ namespace MacropadConfigurator;
 public partial class App : Application
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+    public new static App Current => (App)Application.Current;
     public IServiceProvider Services { get; }
+
+    private TaskbarIcon notifyIcon = null!;
+    private MainWindow mainWindow = null!;
 
     public App()
     {
@@ -41,12 +46,18 @@ public partial class App : Application
     {
         logger.Info("Application starting...");
 
+        // Initialize settings
         var settings = Services.GetRequiredService<SettingsService>();
         settings.Load();
 
+        // Initialize the NotifyIcon
+        notifyIcon = (TaskbarIcon)FindResource("NotifyIcon");
+        notifyIcon.DataContext = new NotifyIconViewModel(this);
+
         var vm = Services.GetRequiredService<MainViewModel>();
-        var win = new MainWindow { DataContext = vm };
-        win.Show();
+        mainWindow = new MainWindow { DataContext = vm };
+
+        ShowWindow();
     }
 
     private void ApplicationExit(object sender, ExitEventArgs e)
@@ -55,5 +66,23 @@ public partial class App : Application
 
         var settings = Services.GetRequiredService<SettingsService>();
         settings.Save();
+
+        notifyIcon.Dispose();
+    }
+
+    public void ShowWindow()
+    {
+        mainWindow.Show();
+        mainWindow.Activate();
+    }
+
+    public void HideWindow()
+    {
+        mainWindow.Hide();
+    }
+
+    public void ExitApplication()
+    {
+        Shutdown();
     }
 }

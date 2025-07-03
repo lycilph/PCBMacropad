@@ -22,6 +22,7 @@ public partial class MainViewModel : ObservableObject, ILifecycleAware
         logger.Info("Hiding the main window");
 
         e.Cancel = true;
+        App.Current.HideWindow();
     }
 
     [RelayCommand]
@@ -30,13 +31,5 @@ public partial class MainViewModel : ObservableObject, ILifecycleAware
         logger.Info("Toggle settings");
 
         SettingsViewModel.IsOpen = !SettingsViewModel.IsOpen;
-    }
-
-    [RelayCommand]
-    public void Exit()
-    {
-        logger.Info("Shutting down from the main window");
-
-        App.Current.Shutdown();
     }
 }
