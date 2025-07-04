@@ -31,9 +31,10 @@ public partial class App : Application
         var services = new ServiceCollection();
 
         // Register singletons
+        services.AddSingleton<ApplicationManager>();
+        services.AddSingleton<ShortcutManager>();
         services.AddSingleton<SettingsService>();
-
-        // These view models are singletons because they are used by multiple view models
+        services.AddSingleton<CompilerService>();
 
         // Register view models
         services.AddTransient<ShellViewModel>();
@@ -50,9 +51,9 @@ public partial class App : Application
     {
         logger.Info("Application starting...");
 
-        // Initialize settings
-        var settings = Services.GetRequiredService<SettingsService>();
-        settings.Load();
+        // Initialize application
+        var applicationManager = Services.GetRequiredService<ApplicationManager>();
+        applicationManager.Load();
 
         // Initialize the NotifyIcon
         notifyIcon = (TaskbarIcon)FindResource("NotifyIcon");
@@ -69,8 +70,8 @@ public partial class App : Application
     {
         logger.Info("Application exiting...");
 
-        var settings = Services.GetRequiredService<SettingsService>();
-        settings.Save();
+        var applicationManager = Services.GetRequiredService<ApplicationManager>();
+        applicationManager.Save();
 
         notifyIcon.Dispose();
     }

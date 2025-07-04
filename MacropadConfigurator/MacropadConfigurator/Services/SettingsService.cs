@@ -14,8 +14,6 @@ public class SettingsService
     public static readonly string Dark = "Dark";
     public static readonly string DefaultColorScheme = "Steel";
 
-    public readonly string settings_file = "settings.json";
-
     public List<Theme> Themes { get; private set; }
 
     public SettingsService()
@@ -40,26 +38,15 @@ public class SettingsService
         ThemeManager.Current.ChangeThemeColorScheme(App.Current, color_scheme);
     }
 
-    public string GetPath()
-    {
-        string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        string appFolderPath = Path.Combine(appDataPath, "MacropadConfigurator");
-
-        // Ensure the directory exists
-        Directory.CreateDirectory(appFolderPath);
-
-        return Path.Combine(appFolderPath, settings_file);
-    }
-
-    public void Load()
+    public void Load(string path)
     {
         logger.Info("Loading settings");
 
         try
         {
-            if (File.Exists(GetPath()))
+            if (File.Exists(path))
             {
-                string json = File.ReadAllText(GetPath());
+                string json = File.ReadAllText(path);
                 var settings = JsonSerializer.Deserialize<Settings>(json);
 
                 if (settings != null)
@@ -71,11 +58,11 @@ public class SettingsService
         }
         catch (Exception ex)
         {
-            logger.Error($"Error loading theme settings: {ex.Message}");
+            logger.Error($"Error loading settings: {ex.Message}");
         }
     }
 
-    public void Save()
+    public void Save(string path)
     {
         logger.Info("Saving settings");
 
@@ -88,11 +75,11 @@ public class SettingsService
         try
         {
             string json = JsonSerializer.Serialize(settings);
-            File.WriteAllText(GetPath(), json);
+            File.WriteAllText(path, json);
         }
         catch (Exception ex)
         {
-            logger.Error($"Error saving theme settings: {ex.Message}");
+            logger.Error($"Error saving settings: {ex.Message}");
         }
     }
 }

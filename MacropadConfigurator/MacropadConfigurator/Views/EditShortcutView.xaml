@@ -4,10 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ae="http://icsharpcode.net/sharpdevelop/avalonedit"
+             xmlns:icon="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:local="clr-namespace:MacropadConfigurator"
              xmlns:vm="clr-namespace:MacropadConfigurator.ViewModels"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800"
+             d:DesignHeight="600" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance Type=vm:EditShortcutViewModel, IsDesignTimeCreatable=False}">
     <Grid Margin="10">
         <Grid.RowDefinitions>
@@ -15,22 +16,23 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
+            <RowDefinition Height="100"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0"
                     Orientation="Horizontal">
             <TextBlock Text="Name" Width="75" VerticalAlignment="Center"/>
-            <TextBox Text="{Binding Shortcut.Name}" Width="250"/>
+            <TextBox Text="{Binding Name}" Width="250"/>
             <TextBlock Text="Text" Width="75" Margin="20 0 0 0" VerticalAlignment="Center" ToolTip="Text shown on macropad (5 chars max)"/>
-            <TextBox Text="{Binding Shortcut.Text}" MaxLength="5" Width="100"/>
+            <TextBox Text="{Binding Text}" MaxLength="5" Width="100"/>
         </StackPanel>
 
         <StackPanel Grid.Row="1"
                     Orientation="Horizontal"
                     Margin="0 5">
             <TextBlock Text="Key" Width="75" VerticalAlignment="Center"/>
-            <TextBox Text="{Binding Shortcut.Key}" Width="250"/>
+            <TextBox Text="{Binding Key}" Width="250"/>
         </StackPanel>
 
         <StackPanel Grid.Row="2"
@@ -43,7 +45,7 @@
         </StackPanel>
 
         <ae:TextEditor Grid.Row="3"
-                       Margin="0 10"
+                       Margin="0 10 0 0"
                        SyntaxHighlighting="C#"
                        FontFamily="Consolas"
                        FontSize="10pt"
@@ -52,17 +54,34 @@
                        BorderBrush="Black"
                        Document="{Binding Document}"/>
 
-        <StackPanel Grid.Row="4" 
-                    Orientation="Horizontal"
-                    HorizontalAlignment="Right">
-            <Button Content="Save"
+        <TextBox Grid.Row="4"
+                 Margin="0 10 0 0"
+                 IsReadOnly="True"
+                 Text="{Binding Output}"/>
+
+        <Grid Grid.Row="5" 
+              Margin="0 10 0 0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <Button Grid.Column="0"
+                    Content="{icon:Lucide Kind=Check}"
+                    ToolTip="Compile script"
+                    HorizontalAlignment="Left"
+                    Command="{Binding CompileCommand}"/>
+            
+            <Button Grid.Column="1"
+                    Content="Save"
                     Width="75"
-                    IsDefault="True"/>
-            <Button Content="Cancel"
+                    Command="{Binding SaveCommand}"/>
+            <Button Grid.Column="2"
+                    Content="Cancel"
                     Width="75"
-                    IsCancel="True"
                     Margin="10 0 0 0"
-                    Command="{Binding BackCommand}"/>
-        </StackPanel>
+                    Command="{Binding CancelCommand}"/>
+        </Grid>
     </Grid>
 </UserControl>

@@ -1,6 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.CodeAnalysis.Scripting;
 
 namespace MacropadConfigurator.Models;
 
@@ -23,8 +24,8 @@ public partial class Shortcut : ObservableObject
     [ObservableProperty]
     public string script;
 
-    //[JsonIgnore]
-    //public Script<object> CompiledScript { get; set; } = null!;
+    [JsonIgnore]
+    public Script<object> CompiledScript { get; set; } = null!;
 
     public Shortcut(Key key, string name, string text, string script) : this(key, ModifierKeys.None, name, text, script) { }
 
