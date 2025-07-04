@@ -6,14 +6,12 @@ using ICSharpCode.AvalonEdit.Document;
 using MacropadConfigurator.Messages;
 using MacropadConfigurator.Models;
 using MacropadConfigurator.Services;
-using Microsoft.CodeAnalysis.Scripting;
 
 namespace MacropadConfigurator.ViewModels;
 
 public partial class EditShortcutViewModel : ObservableObject
 {
     private readonly CompilerService compilerService;
-    private Script<object>? script;
 
     [ObservableProperty]
     private Shortcut? shortcut;
@@ -60,18 +58,40 @@ public partial class EditShortcutViewModel : ObservableObject
             Document = new TextDocument(value.Script);
         }
     }
+    
+    private ModifierKeys ConvertToModifierKeys()
+    {
+        return (Control ? ModifierKeys.Control : ModifierKeys.None) |
+               (Shift ? ModifierKeys.Shift : ModifierKeys.None) |
+               (Alt ? ModifierKeys.Alt : ModifierKeys.None);
+    }
 
     [RelayCommand]
     private void Compile()
     {
-        (var result, var msg, script) = compilerService.CompileScript(Document.Text);
+        (var result, var msg, _) = compilerService.CompileScript(Document.Text);
         Output = result ? "Success" : msg;
     }
 
     [RelayCommand]
     private void Save()
     {
-        compilerService.ExecuteScript(script);
+        if (Shortcut == null) return;
+
+        (var result, var msg, var script) = compilerService.CompileScript(Document.Text);
+        if (result && script != null)
+        {
+            Shortcut.Name = Name;
+            Shortcut.Text = Text;
+            Shortcut.Key = KeyParser.StringToKey(Key);
+            Shortcut.Modifiers = ConvertToModifierKeys();
+            Shortcut.Script = Document.Text;
+            WeakReferenceMessenger.Default.Send(new BackMessage());
+        }
+        else
+        {
+            Output = msg;
+        }
     }
 
     [RelayCommand]

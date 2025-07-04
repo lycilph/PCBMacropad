@@ -35,6 +35,8 @@ public class ApplicationManager
 
         if (shortcutManager.Shortcuts.Count == 0)
             shortcutManager.AddDefaults();
+
+        shortcutManager.Initialize();
     }
 
     public void Save()

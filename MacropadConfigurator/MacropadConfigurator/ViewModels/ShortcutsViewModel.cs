@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -15,13 +14,16 @@ public partial class ShortcutsViewModel : ObservableObject
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
     private readonly ShortcutManager shortcutManager;
+    private readonly CompilerService compilerService;
 
     [ObservableProperty]
     private ObservableCollection<Shortcut> shortcuts;
 
-    public ShortcutsViewModel(ShortcutManager shortcutManager)
+    public ShortcutsViewModel(ShortcutManager shortcutManager, CompilerService compilerService)
     {
         this.shortcutManager = shortcutManager;
+        this.compilerService = compilerService;
+
         Shortcuts = shortcutManager.Shortcuts;
     }
 
@@ -45,5 +47,6 @@ public partial class ShortcutsViewModel : ObservableObject
     {
         logger.Info($"Executing {shortcut.Name}");
         WeakReferenceMessenger.Default.Send($"Executing {shortcut.Name}");
+        compilerService.ExecuteScript(shortcut.CompiledScript);
     }
 }

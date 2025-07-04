@@ -12,14 +12,34 @@ public class ShortcutManager
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
+    private readonly CompilerService compilerService;
+
     public ObservableCollection<Shortcut> Shortcuts { get; private set; } = [];
+
+    public ShortcutManager(CompilerService compilerService)
+    {
+        this.compilerService = compilerService;
+    }
 
     public void AddDefaults()
     {
-        Shortcuts.Add(new Shortcut(Key.F13, "Open Apps", "Open", "ShowMessageBox(\"Testing\");"));
-        Shortcuts.Add(new Shortcut(Key.F14, "Position Apps", "Pos.", "bla bla"));
-        Shortcuts.Add(new Shortcut(Key.F15, "Show Configurator", "GUI", "bla bla"));
-        Shortcuts.Add(new Shortcut(Key.X, ModifierKeys.Alt | ModifierKeys.Shift | ModifierKeys.Control, "Exit", "Exit", "bla bla"));
+        Shortcuts.Add(new Shortcut(Key.F13, "Open Apps", "Open", "ShowMessageBox(\"Opening Apps\");"));
+        Shortcuts.Add(new Shortcut(Key.F14, "Position Apps", "Pos", "ShowMessageBox(\"Positioning Apps\");"));
+        Shortcuts.Add(new Shortcut(Key.F15, "Show Configurator", "GUI", ""));
+        Shortcuts.Add(new Shortcut(Key.X, ModifierKeys.Alt | ModifierKeys.Shift | ModifierKeys.Control, "Exit", "Exit", ""));
+    }
+
+    public void Initialize()
+    {
+        foreach (var shortcut in Shortcuts)
+        {
+            (var result, var msg, var script) = compilerService.CompileScript(shortcut.Script);
+         
+            if (result && script != null)
+                shortcut.CompiledScript = script;
+            else
+                logger.Error($"Error compiling script for shortcut {shortcut.Name}: {msg}");
+        }
     }
 
     public void Load(string path)
