@@ -61,35 +61,22 @@
 
                             <Button Grid.Column="3"
                                     Margin="5 0"
-                                    Content="{icon:Lucide Kind=Trash2}"/>
+                                    Content="{icon:Lucide Kind=Trash2}"
+                                    Command="{Binding DataContext.DeleteCommand, 
+                                                      RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=v:ShortcutsView}}"
+                                    CommandParameter="{Binding}"/>
                             <Button Grid.Column="4"
                                     Margin="5 0"
-                                    Content="{icon:Lucide Kind=Settings}"/>
+                                    Content="{icon:Lucide Kind=Settings}"
+                                    Command="{Binding DataContext.EditCommand, 
+                                                      RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=v:ShortcutsView}}"
+                                    CommandParameter="{Binding}"/>
                             <Button Grid.Column="5"
                                     Margin="5 0"
                                     Content="{icon:Lucide Kind=Play}"
                                     Command="{Binding DataContext.ExecuteCommand, 
                                                       RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=v:ShortcutsView}}"
                                     CommandParameter="{Binding}"/>
-                            
-                            <!--<Button Grid.Column="3" 
-                                    Margin="5 0"
-                                    Command="{Binding DataContext.EditCommand, 
-                                                      RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:MainWindow}}"
-                                    CommandParameter="{Binding}">
-                                <Image Source="/Assets/settings.png"
-                                       Width="20"
-                                       Height="20"/>
-                            </Button>
-                            <Button Grid.Column="4" 
-                                    Margin="5 0"
-                                    Command="{Binding DataContext.ExecuteCommand, 
-                                                      RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:MainWindow}}"
-                                    CommandParameter="{Binding}">
-                                <Image Source="/Assets/play.png"
-                                       Width="20"
-                                       Height="20"/>
-                            </Button>-->
                         </Grid>
                     </Border>
                 </DataTemplate>

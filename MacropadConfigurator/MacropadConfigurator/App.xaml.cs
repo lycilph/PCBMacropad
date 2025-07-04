@@ -15,7 +15,7 @@ public partial class App : Application
     public IServiceProvider Services { get; }
 
     private TaskbarIcon notifyIcon = null!;
-    private MainWindow mainWindow = null!;
+    private ShellWindow mainWindow = null!;
 
     public App()
     {
@@ -36,10 +36,12 @@ public partial class App : Application
         // These view models are singletons because they are used by multiple view models
 
         // Register view models
+        services.AddTransient<ShellViewModel>();
         services.AddTransient<MainViewModel>();
         services.AddTransient<SettingsViewModel>();
         services.AddTransient<ConfigurationViewModel>();
         services.AddTransient<ShortcutsViewModel>();
+        services.AddTransient<EditShortcutViewModel>();
 
         return services.BuildServiceProvider();
     }
@@ -57,8 +59,8 @@ public partial class App : Application
         notifyIcon.DataContext = new NotifyIconViewModel(this);
 
         // Initialize main window
-        var vm = Services.GetRequiredService<MainViewModel>();
-        mainWindow = new MainWindow { DataContext = vm };
+        var vm = Services.GetRequiredService<ShellViewModel>();
+        mainWindow = new ShellWindow { DataContext = vm };
 
         ShowWindow();
     }

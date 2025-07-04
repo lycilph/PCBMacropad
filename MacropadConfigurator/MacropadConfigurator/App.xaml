@@ -40,6 +40,10 @@
             <c:ShortcutConverter x:Key="shortcut_converter"/>
 
             <!-- Datatemplates -->
+            <DataTemplate DataType="{x:Type vm:MainViewModel}">
+                <v:MainView/>
+            </DataTemplate>
+
             <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
                 <v:SettingsView/>
             </DataTemplate>
@@ -50,6 +54,10 @@
 
             <DataTemplate DataType="{x:Type vm:ConfigurationViewModel}">
                 <v:ConfigurationView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type vm:EditShortcutViewModel}">
+                <v:EditShortcutView/>
             </DataTemplate>
         </ResourceDictionary>
     </Application.Resources>
