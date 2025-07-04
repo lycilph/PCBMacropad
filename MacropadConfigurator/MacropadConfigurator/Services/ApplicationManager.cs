@@ -32,6 +32,9 @@ public class ApplicationManager
     {
         settingsService.Load(GetPath(settingsFile));
         shortcutManager.Load(GetPath(shortcutsFile));
+
+        if (shortcutManager.Shortcuts.Count == 0)
+            shortcutManager.AddDefaults();
     }
 
     public void Save()

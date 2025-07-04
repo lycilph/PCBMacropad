@@ -74,7 +74,9 @@ public class SettingsService
 
         try
         {
-            string json = JsonSerializer.Serialize(settings);
+            // Configure the serializer to write indented JSON for readability.
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            string json = JsonSerializer.Serialize(settings, options);
             File.WriteAllText(path, json);
         }
         catch (Exception ex)
