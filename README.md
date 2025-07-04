@@ -16,3 +16,6 @@ Keycaps
 * https://www.thingiverse.com/thing:4186055
 * https://www.printables.com/model/405230-blank-xda-keycap-mx-compatible
 * https://www.printables.com/model/397962-blank-xda-profile-keycaps?ref=makerluis.com
+
+Arduino simulator
+* https://wokwi.com/projects/new/arduino-uno
