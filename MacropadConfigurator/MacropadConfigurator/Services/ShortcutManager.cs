@@ -33,16 +33,41 @@ public partial class ShortcutManager : ObservableObject
         Shortcuts.Add(new Shortcut(Key.X, ModifierKeys.Alt | ModifierKeys.Shift | ModifierKeys.Control, "Exit", "Exit", ""));
     }
 
-    public void Initialize()
+    public async Task InitializeAsync()
     {
-        foreach (var shortcut in Shortcuts)
+        logger.Info("Starting shortcut compilation...");
+        IsReady = false;
+
+        // 1. Create a list of compilation tasks.
+        var compilationTasks = Shortcuts.Select(async shortcut =>
         {
-            (var result, var msg, var script) = compilerService.CompileScript(shortcut.Script);
-         
+            // 2. Call the new async method for each shortcut.
+            (var result, var msg, var script) = await compilerService.CompileScriptAsync(shortcut.Script);
+
             if (result && script != null)
                 shortcut.CompiledScript = script;
             else
                 logger.Error($"Error compiling script for shortcut {shortcut.Name}: {msg}");
+        }).ToList(); // .ToList() ensures all tasks are started.
+
+        try
+        {
+            // 3. Wait for ALL of the compilation tasks to complete.
+            await Task.WhenAll(compilationTasks);
+            logger.Info("All shortcuts have been processed.");
+        }
+        catch (Exception ex)
+        {
+            // This catch block is for exceptions bubbling up from Task.WhenAll itself,
+            // though our per-task logic already handles most errors.
+            logger.Error($"An unexpected error occurred during compilation: {ex.Message}");
+        }
+        finally
+        {
+            // 4. Set the ready flag to true, regardless of success or failure.
+            //    This signals that the initialization process is complete.
+            IsReady = true;
+            logger.Info("Initialization complete. Ready state is now true.");
         }
     }
 

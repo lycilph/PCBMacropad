@@ -36,7 +36,7 @@ public class CompilerService
 
     }
 
-    public (bool, string, Script<object>?) CompileScript(string script)
+    public Task<(bool, string, Script<object>?)> CompileScriptAsync(string script)
     {
         var options = ScriptOptions.Default
                 .AddReferences(
@@ -49,26 +49,37 @@ public class CompilerService
                     "System.Diagnostics",
                     "System.Windows"
                  );
-        try
-        {
-            // The globalsType parameter is crucial. It tells the compiler what to expect when the script is eventually run.
-            var compiledScript = CSharpScript.Create(script, options, globalsType: typeof(ScriptHost));
 
-            // Check for compilation errors before proceeding
-            var diagnostics = compiledScript.GetCompilation().GetDiagnostics();
-            if (diagnostics.Any(d => d.Severity == Microsoft.CodeAnalysis.DiagnosticSeverity.Error))
+        return Task.Run(() =>
+        {
+            // Return type is declared explicitly to avoid confusing the compiler about the return type here
+            (bool success, string message, Script<object>? script) result;
+
+            try
             {
-                var errors = string.Join("\n", diagnostics.Select(d => d.GetMessage()));
-                return (false, errors, null);
+                // The globalsType parameter is crucial. It tells the compiler what to expect when the script is eventually run.
+                var compiledScript = CSharpScript.Create(script, options, globalsType: typeof(ScriptHost));
+
+                // Check for compilation errors before proceeding
+                var diagnostics = compiledScript.GetCompilation().GetDiagnostics();
+                if (diagnostics.Any(d => d.Severity == Microsoft.CodeAnalysis.DiagnosticSeverity.Error))
+                {
+                    var errors = string.Join("\n", diagnostics.Select(d => d.GetMessage()));
+                    result = (false, errors, null);
+                }
+                else
+                {
+                    // If compilation is successful, store the compiled script
+                    result = (true, string.Empty, compiledScript);
+                }
+            }
+            catch (Exception ex)
+            {
+                // This will catch syntax errors in the script.
+                result = (false, ex.Message, null);
             }
 
-            // If compilation is successful, store the compiled script
-            return (true, string.Empty, compiledScript);
-        }
-        catch (Exception ex)
-        {
-            // This will catch syntax errors in the script.
-            return (false, ex.Message, null);
-        }
+            return result;
+        });
     }
 }

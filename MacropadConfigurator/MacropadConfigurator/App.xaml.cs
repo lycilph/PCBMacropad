@@ -58,7 +58,7 @@ public partial class App : Application
         // Initialize application
         var applicationManager = Services.GetRequiredService<ApplicationManager>();
         applicationManager.Load();
-        applicationManager.Initialize();
+        applicationManager.InitializeAsync();
 
         // Initialize the NotifyIcon
         notifyIcon = (TaskbarIcon)FindResource("NotifyIcon");

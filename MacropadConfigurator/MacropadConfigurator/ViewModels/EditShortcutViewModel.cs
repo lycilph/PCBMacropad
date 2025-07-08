@@ -1,4 +1,5 @@
-﻿using System.Windows.Input;
+﻿using System.Threading.Tasks;
+using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -67,18 +68,18 @@ public partial class EditShortcutViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void Compile()
+    private async Task CompileAsync()
     {
-        (var result, var msg, _) = compilerService.CompileScript(Document.Text);
+        (var result, var msg, _) = await compilerService.CompileScriptAsync(Document.Text);
         Output = result ? "Success" : msg;
     }
 
     [RelayCommand]
-    private void Save()
+    private async Task SaveAsync()
     {
         if (Shortcut == null) return;
 
-        (var result, var msg, var compiled_script) = compilerService.CompileScript(Document.Text);
+        (var result, var msg, var compiled_script) = await compilerService.CompileScriptAsync(Document.Text);
         if (result && compiled_script != null)
         {
             Shortcut.Name = Name;
@@ -95,6 +96,7 @@ public partial class EditShortcutViewModel : ObservableObject
         }
 
         Shortcut = null;
+        Output = string.Empty;
     }
 
     [RelayCommand]
@@ -103,5 +105,6 @@ public partial class EditShortcutViewModel : ObservableObject
         WeakReferenceMessenger.Default.Send(new BackMessage());
 
         Shortcut = null;
+        Output = string.Empty;
     }
 }

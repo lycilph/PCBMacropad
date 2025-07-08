@@ -49,9 +49,9 @@ public class ApplicationManager
     }
 
     // Should be called after load (so the shortcut scripts have been loaded and are ready to be compiled)
-    public void Initialize()
+    public async void InitializeAsync()
     {
-        shortcutManager.Initialize();
+        await shortcutManager.InitializeAsync();
         keyboardHook.ShortcutPressed += OnShortcutPressedAsync;
     }
 
