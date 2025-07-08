@@ -2,17 +2,21 @@
 using System.IO;
 using System.Text.Json;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
 using MacropadConfigurator.Extensions;
 using MacropadConfigurator.Models;
 using NLog;
 
 namespace MacropadConfigurator.Services;
 
-public class ShortcutManager
+public partial class ShortcutManager : ObservableObject
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
     private readonly CompilerService compilerService;
+
+    [ObservableProperty]
+    private bool isReady = false;
 
     public ObservableCollection<Shortcut> Shortcuts { get; private set; } = [];
 

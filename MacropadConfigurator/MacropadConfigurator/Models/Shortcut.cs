@@ -25,7 +25,7 @@ public partial class Shortcut : ObservableObject
     public string script;
 
     [JsonIgnore]
-    public Script<object> CompiledScript { get; set; } = null!;
+    public Script<object>? CompiledScript { get; set; } = null;
 
     public Shortcut(Key key, string name, string text, string script) : this(key, ModifierKeys.None, name, text, script) { }
 

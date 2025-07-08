@@ -3,17 +3,24 @@ using System.Windows;
 using MacropadConfigurator.Models;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
+using NLog;
 
 namespace MacropadConfigurator.Services;
 
 public class CompilerService
 {
+    private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+
     private readonly ScriptHost host = new(App.Current);
 
     public async void ExecuteScript(Script<object>? script)
     {
         // Ensure we have a compiled script to run
-        if (script == null) return;
+        if (script == null)
+        {
+            logger.Warn("Couldn't execute null script");
+            return; 
+        }
 
         try
         {

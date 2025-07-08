@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -26,6 +27,14 @@ public partial class ShortcutsViewModel : ObservableObject
         this.compilerService = compilerService;
 
         Shortcuts = shortcutManager.Shortcuts;
+
+        shortcutManager.PropertyChanged += ShortcutManagerPropertyChanged;
+    }
+
+    private void ShortcutManagerPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ShortcutManager.IsReady))
+            ExecuteCommand.NotifyCanExecuteChanged();
     }
 
     [RelayCommand]
@@ -56,11 +65,13 @@ public partial class ShortcutsViewModel : ObservableObject
         WeakReferenceMessenger.Default.Send(new EditShortcutMessage(shortcut));
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanExecute))]
     private void Execute(Shortcut shortcut)
     {
         logger.Info($"Executing {shortcut.Name}");
         WeakReferenceMessenger.Default.Send($"Executing {shortcut.Name}");
         compilerService.ExecuteScript(shortcut.CompiledScript);
     }
+
+    private bool CanExecute() => shortcutManager.IsReady;
 }
