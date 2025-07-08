@@ -3,6 +3,7 @@ using Hardcodet.Wpf.TaskbarNotification;
 using MacropadConfigurator.Services;
 using MacropadConfigurator.ViewModels;
 using MacropadConfigurator.Views;
+using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.DependencyInjection;
 using NLog;
 
@@ -30,6 +31,9 @@ public partial class App : Application
     {
         var services = new ServiceCollection();
 
+        // Framework stuff
+        services.AddSingleton(DialogCoordinator.Instance);
+
         // Register singletons
         services.AddSingleton<ApplicationManager>();
         services.AddSingleton<ShortcutManager>();
@@ -54,6 +58,7 @@ public partial class App : Application
         // Initialize application
         var applicationManager = Services.GetRequiredService<ApplicationManager>();
         applicationManager.Load();
+        applicationManager.Initialize();
 
         // Initialize the NotifyIcon
         notifyIcon = (TaskbarIcon)FindResource("NotifyIcon");
@@ -72,6 +77,7 @@ public partial class App : Application
 
         var applicationManager = Services.GetRequiredService<ApplicationManager>();
         applicationManager.Save();
+        applicationManager.Cleanup();
 
         notifyIcon.Dispose();
     }

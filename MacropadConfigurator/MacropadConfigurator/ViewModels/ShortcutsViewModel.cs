@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using MacropadConfigurator.Messages;
 using MacropadConfigurator.Models;
 using MacropadConfigurator.Services;
+using MahApps.Metro.Controls.Dialogs;
 using NLog;
 
 namespace MacropadConfigurator.ViewModels;
@@ -28,10 +29,23 @@ public partial class ShortcutsViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void Delete(Shortcut shortcut)
+    private void Create()
     {
-        logger.Info($"Deleting {shortcut.Name}");
-        WeakReferenceMessenger.Default.Send($"Deleting {shortcut.Name}");
+        var shortcut = shortcutManager.Create();
+        WeakReferenceMessenger.Default.Send(new EditShortcutMessage(shortcut));
+    }
+
+    [RelayCommand]
+    private async Task DeleteAsync(Shortcut shortcut)
+    {
+        var result = await WeakReferenceMessenger.Default.Send(new DeleteConfirmationRequestMessage(shortcut.Name));
+
+        if (result == MessageDialogResult.Affirmative)
+        {
+            logger.Info($"Deleting {shortcut.Name}");
+            WeakReferenceMessenger.Default.Send($"Deleting {shortcut.Name}");
+            shortcutManager.Delete(shortcut);
+        }
     }
 
     [RelayCommand]

@@ -5,6 +5,7 @@
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                  xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                 xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
                  xmlns:icon="http://metro.mahapps.com/winfx/xaml/iconpacks"
                  xmlns:local="clr-namespace:MacropadConfigurator"
                  xmlns:behavior="clr-namespace:MacropadConfigurator.Behaviors"
@@ -15,7 +16,8 @@
                  Height="600" 
                  Width="800"
                  WindowStartupLocation="CenterScreen"
-                 ResizeMode="CanMinimize">
+                 ResizeMode="CanMinimize"
+                 Dialog:DialogParticipation.Register="{Binding}">
     <i:Interaction.Behaviors>
         <behavior:LifecycleBehavior/>
     </i:Interaction.Behaviors>

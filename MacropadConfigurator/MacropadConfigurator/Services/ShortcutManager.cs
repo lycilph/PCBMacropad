@@ -42,6 +42,19 @@ public class ShortcutManager
         }
     }
 
+    public Shortcut Create()
+    {
+        var shortcut = new Shortcut(Key.A, "New Shortcut", "NA", "");
+        Shortcuts.Add(shortcut);
+        return shortcut;
+    }
+
+    public void Delete(Shortcut shortcut)
+    {
+        logger.Info($"Deleting shortcut: {shortcut.Name}");
+        Shortcuts.Remove(shortcut);
+    }
+
     public void Load(string path)
     {
         logger.Info("Loading shortcuts");

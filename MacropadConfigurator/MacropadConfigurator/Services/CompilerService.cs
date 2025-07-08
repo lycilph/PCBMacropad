@@ -8,7 +8,7 @@ namespace MacropadConfigurator.Services;
 
 public class CompilerService
 {
-    private readonly ScriptHost host = new();
+    private readonly ScriptHost host = new(App.Current);
 
     public async void ExecuteScript(Script<object>? script)
     {

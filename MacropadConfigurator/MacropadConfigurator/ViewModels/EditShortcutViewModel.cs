@@ -78,25 +78,30 @@ public partial class EditShortcutViewModel : ObservableObject
     {
         if (Shortcut == null) return;
 
-        (var result, var msg, var script) = compilerService.CompileScript(Document.Text);
-        if (result && script != null)
+        (var result, var msg, var compiled_script) = compilerService.CompileScript(Document.Text);
+        if (result && compiled_script != null)
         {
             Shortcut.Name = Name;
             Shortcut.Text = Text;
             Shortcut.Key = KeyParser.StringToKey(Key);
             Shortcut.Modifiers = ConvertToModifierKeys();
             Shortcut.Script = Document.Text;
+            Shortcut.CompiledScript = compiled_script;
             WeakReferenceMessenger.Default.Send(new BackMessage());
         }
         else
         {
             Output = msg;
         }
+
+        Shortcut = null;
     }
 
     [RelayCommand]
     private void Cancel()
     {
         WeakReferenceMessenger.Default.Send(new BackMessage());
+
+        Shortcut = null;
     }
 }
