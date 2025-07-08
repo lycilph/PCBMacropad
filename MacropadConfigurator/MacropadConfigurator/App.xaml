@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:tb="http://www.hardcodet.net/taskbar"
              xmlns:local="clr-namespace:MacropadConfigurator"
+             xmlns:m="clr-namespace:MacropadConfigurator.Models"
              xmlns:vm="clr-namespace:MacropadConfigurator.ViewModels"
              xmlns:v="clr-namespace:MacropadConfigurator.Views"
              xmlns:c="clr-namespace:MacropadConfigurator.Converters"
@@ -58,6 +59,10 @@
 
             <DataTemplate DataType="{x:Type vm:EditShortcutViewModel}">
                 <v:EditShortcutView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type m:MacropadButton}">
+                <v:MacropadButtonView/>
             </DataTemplate>
         </ResourceDictionary>
     </Application.Resources>

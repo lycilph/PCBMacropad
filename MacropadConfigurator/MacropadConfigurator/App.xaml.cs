@@ -37,6 +37,7 @@ public partial class App : Application
         // Register singletons
         services.AddSingleton<ApplicationManager>();
         services.AddSingleton<ShortcutManager>();
+        services.AddSingleton<MacropadManager>();
         services.AddSingleton<SettingsService>();
         services.AddSingleton<CompilerService>();
 
