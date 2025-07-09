@@ -1,4 +1,11 @@
-#include "HID-Project.h"
+#include <HID-Project.h>
+#include <Button.h>
+
+Button button1(0); // Connect your button between pin 0 and GND
+Button button2(1);
+Button button3(2);
+
+uint8_t rawhidData[255];
 
 // Define the maximum size of our reassembly buffer.
 // It should be larger than the largest message you expect.
@@ -21,31 +28,67 @@ enum ReceiveState {
   RECEIVING
 };
 
-// Global variables for the state machine
 ReceiveState currentState = IDLE;
 uint8_t largeBuffer[MAX_BUFFER_SIZE];
 uint16_t totalDataSize = 0;
 uint16_t bytesReceived = 0;
 
-
 void setup() {
-  Serial.begin(115200);
-  while (!Serial); // Wait for serial port to open
+	Serial.begin(9600);
+  while (!Serial);
 
-  // Start RawHID. This enables receiving generic reports.
-  RawHID.begin(largeBuffer, RAW_HID_PAYLOAD_SIZE);
-  
-  Serial.println("Arduino RawHID Receiver Ready.");
-  Serial.println("Waiting for a START command from the host...");
+  button1.begin();
+  button2.begin();
+  button3.begin();
+
+  // Sends a clean report to the host. This is important on any Arduino type.
+  Keyboard.begin();
+
+  // Set the RawHID OUT report array.
+  // Feature reports are also (parallel) possible, see the other example for this.
+  RawHID.begin(rawhidData, sizeof(rawhidData));
 }
 
 void loop() {
+  if (button1.pressed())
+  {
+    Serial.println("Button 1 pressed");
+    Keyboard.write('1');
+  }
+ 
+  if (button2.pressed())
+  {
+    Serial.println("Button 2 pressed");
+    Keyboard.write('2');
+  }
+ 
+  if (button3.pressed())
+  {
+    Serial.println("Button 3 pressed");
+    Keyboard.write('3');
+  }
+
+  // Check if there is new data from the RawHID device
+  // auto bytesAvailable = RawHID.available();
+  // if (bytesAvailable)
+  // {
+  //   Serial.print("Bytes available on raw HID input: ");
+  //   Serial.println(bytesAvailable);
+
+  //   RawHID.readBytes()
+
+  //   // Mirror data via Serial
+  //   while (bytesAvailable--) {
+  //     Serial.println(RawHID.read());
+  //   }
+  // }
+
   // Check if the host has sent any data
   if (RawHID.available() > 0) {
     uint8_t packetBuffer[RAW_HID_PAYLOAD_SIZE];
     
     // Read the incoming report into our packet buffer
-    RawHID.read(packetBuffer);
+    RawHID.readBytes(packetBuffer, RAW_HID_PAYLOAD_SIZE);
     
     // Process the packet based on our current state
     switch (currentState) {
@@ -110,17 +153,24 @@ void loop() {
 }
 
 // This function is called when the 400-byte message is fully assembled.
-void processReceivedData() {
+void processReceivedData()
+{
   Serial.print("Successfully received ");
   Serial.print(bytesReceived); // Should be 400 or slightly more due to chunking
   Serial.println(" bytes.");
-  Serial.println("Printing first 20 bytes of the message:");
-  
-  for (int i = 0; i < 20; i++) {
-    Serial.print("0x");
-    if (largeBuffer[i] < 0x10) Serial.print("0");
-    Serial.print(largeBuffer[i], HEX);
-    Serial.print(" ");
+
+  for (int i = 0; i < bytesReceived; i++)
+  {
+    Serial.print("Character "); Serial.print(i); Serial.print(" :"); Serial.println(largeBuffer[i]);
   }
-  Serial.println();
+
+  // Serial.println("Printing first 20 bytes of the message:");
+  
+  // for (int i = 0; i < 20; i++) {
+  //   Serial.print("0x");
+  //   if (largeBuffer[i] < 0x10) Serial.print("0");
+  //   Serial.print(largeBuffer[i], HEX);
+  //   Serial.print(" ");
+  // }
+  // Serial.println();
 }

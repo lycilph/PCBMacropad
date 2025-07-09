@@ -6,8 +6,8 @@ internal class Program
 {
     // These must match the device's VID/PID.
     // The defaults for HID-Project's RawHID are:
-    const int VendorId = 0x16C0;
-    const int ProductId = 0x0486;
+    const int VendorId = 0x2341;
+    const int ProductId = 0x8036;
 
     // These must match the Arduino protocol definitions.
     const byte CMD_START_TRANSFER = (byte)'S';
@@ -30,7 +30,7 @@ internal class Program
         Console.WriteLine("Device found! Attempting to open stream...");
 
         // HidSharp streams must be opened with a try/catch block
-        var maxOutputReportLength = device.GetMaxOutputReportLength();
+        var reportLength = device.GetMaxOutputReportLength();
         if (device.TryOpen(out var stream))
         {
             using (stream)
@@ -46,7 +46,7 @@ internal class Program
                 }
 
                 // --- 2. Send the data using our protocol ---
-                SendData(stream, maxOutputReportLength, dataToSend);
+                SendData(stream, reportLength, dataToSend);
             }
         }
         else
