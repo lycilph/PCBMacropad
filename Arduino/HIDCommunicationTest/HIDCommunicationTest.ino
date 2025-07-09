@@ -17,8 +17,12 @@ const int RAW_HID_PAYLOAD_SIZE = 64;
 
 // --- Protocol Definitions ---
 // These must match the C# application definitions.
-const uint8_t CMD_START_TRANSFER = 'S'; // 'S' for Start
-const uint8_t CMD_DATA_PACKET = 'D';    // 'D' for Data
+const uint8_t CMD_START_TRANSFER = 'S';       // PC -> Arduino: Start of a large data send
+const uint8_t CMD_DATA_PACKET = 'D';          // PC -> Arduino: Subsequent data chunk
+const uint8_t CMD_REQUEST_DATA = 'R';         // PC -> Arduino: Request for Arduino to send data back
+const uint8_t CMD_START_RESPONSE = 'A';       // Arduino -> PC: 'A' for Answer/Acknowledge start
+const uint8_t CMD_RESPONSE_DATA_PACKET = 'P'; // Arduino -> PC: 'P' for Payload packet
+
 const int PROTOCOL_HEADER_SIZE = 3; // 1 byte for command, 2 for total size
 const int PROTOCOL_PAYLOAD_SIZE = RAW_HID_PAYLOAD_SIZE - PROTOCOL_HEADER_SIZE; // 64 - 3 = 61
 
@@ -47,6 +51,9 @@ void setup() {
   // Set the RawHID OUT report array.
   // Feature reports are also (parallel) possible, see the other example for this.
   RawHID.begin(rawhidData, sizeof(rawhidData));
+
+  Serial.println("Arduino RawHID Two-Way Transceiver Ready.");
+  Serial.println("Waiting for commands from the host...");
 }
 
 void loop() {
@@ -68,21 +75,6 @@ void loop() {
     Keyboard.write('3');
   }
 
-  // Check if there is new data from the RawHID device
-  // auto bytesAvailable = RawHID.available();
-  // if (bytesAvailable)
-  // {
-  //   Serial.print("Bytes available on raw HID input: ");
-  //   Serial.println(bytesAvailable);
-
-  //   RawHID.readBytes()
-
-  //   // Mirror data via Serial
-  //   while (bytesAvailable--) {
-  //     Serial.println(RawHID.read());
-  //   }
-  // }
-
   // Check if the host has sent any data
   if (RawHID.available() > 0) {
     uint8_t packetBuffer[RAW_HID_PAYLOAD_SIZE];
@@ -90,18 +82,22 @@ void loop() {
     // Read the incoming report into our packet buffer
     RawHID.readBytes(packetBuffer, RAW_HID_PAYLOAD_SIZE);
     
-    // Process the packet based on our current state
+    // Check for a data request command, which can happen in any state
+    if (packetBuffer[0] == CMD_REQUEST_DATA) {
+      Serial.println("Received a data request from PC. Preparing to send 400 bytes...");
+      sendLargeDataToPC();
+      return; // Handled the command, so we can exit the loop iteration
+    }
+
+    // Process other packets based on our current state
     switch (currentState) {
       case IDLE:
-        // In IDLE state, we only care about START commands
         if (packetBuffer[0] == CMD_START_TRANSFER) {
           // A new transfer is starting!
-          // The total size is sent as a 16-bit integer (little-endian)
           totalDataSize = packetBuffer[1] | (packetBuffer[2] << 8);
 
           if (totalDataSize > MAX_BUFFER_SIZE) {
             Serial.println("Error: Requested transfer size is too large.");
-            // Do not proceed with this transfer. Stay in IDLE.
             totalDataSize = 0;
             return;
           }
@@ -110,67 +106,88 @@ void loop() {
           Serial.print(totalDataSize);
           Serial.println(" bytes.");
 
-          // Reset our counter
           bytesReceived = 0;
-          
-          // Copy the first chunk of data from this START packet
           int dataLength = RAW_HID_PAYLOAD_SIZE - PROTOCOL_HEADER_SIZE;
-          memcpy(&largeBuffer[bytesReceived], &packetBuffer[PROTOCOL_HEADER_SIZE], dataLength);
+          memcpy(&largeBuffer[bytesReceived], &packetBuffer[3], dataLength);
           bytesReceived += dataLength;
           
-          // Change state to start accepting DATA packets
           currentState = RECEIVING;
         }
         break;
 
       case RECEIVING:
-        // In RECEIVING state, we only care about DATA commands
         if (packetBuffer[0] == CMD_DATA_PACKET) {
-          // This is a subsequent data packet
-          int dataLength = RAW_HID_PAYLOAD_SIZE - 1; // 1 byte for command
+          int dataLength = RAW_HID_PAYLOAD_SIZE - 1; // Cmd
           memcpy(&largeBuffer[bytesReceived], &packetBuffer[1], dataLength);
           bytesReceived += dataLength;
-          
-          // Optional: Print progress
-          // Serial.print("Received data chunk. Total bytes: ");
-          // Serial.println(bytesReceived);
         }
         
-        // Check if we have received all the expected data
         if (bytesReceived >= totalDataSize) {
-          Serial.println("\n--- Transfer Complete! ---");
+          Serial.println("\n--- PC->Arduino Transfer Complete! ---");
           processReceivedData();
           
-          // Reset for the next transfer
           currentState = IDLE;
           bytesReceived = 0;
           totalDataSize = 0;
-          Serial.println("\nState reset to IDLE. Waiting for next transfer.");
+          Serial.println("\nState reset to IDLE. Waiting for next command.");
         }
         break;
     }
   }
 }
 
-// This function is called when the 400-byte message is fully assembled.
-void processReceivedData()
-{
-  Serial.print("Successfully received ");
-  Serial.print(bytesReceived); // Should be 400 or slightly more due to chunking
-  Serial.println(" bytes.");
-
-  for (int i = 0; i < bytesReceived; i++)
-  {
-    Serial.print("Character "); Serial.print(i); Serial.print(" :"); Serial.println(largeBuffer[i]);
+// *** NEW FUNCTION: Sends 400 bytes from Arduino to PC ***
+void sendLargeDataToPC() {
+  uint8_t dataToSend[400];
+  // Fill the buffer with sample data to send back.
+  // For this example, it's a descending sequence: 255, 254, ...
+  for (int i = 0; i < 400; i++) {
+    dataToSend[i] = 255 - (i % 256);
   }
 
-  // Serial.println("Printing first 20 bytes of the message:");
+  uint16_t bytesSent = 0;
+
+  // --- Send START_RESPONSE Packet ---
+  uint8_t startPacket[RAW_HID_PAYLOAD_SIZE] = {0}; // Initialize to all zeros
+  startPacket[0] = CMD_START_RESPONSE;
+  startPacket[1] = (uint8_t)(400 & 0xFF); // Total size (low byte)
+  startPacket[2] = (uint8_t)((400 >> 8) & 0xFF); // Total size (high byte)
   
-  // for (int i = 0; i < 20; i++) {
-  //   Serial.print("0x");
-  //   if (largeBuffer[i] < 0x10) Serial.print("0");
-  //   Serial.print(largeBuffer[i], HEX);
-  //   Serial.print(" ");
-  // }
-  // Serial.println();
+  int firstChunkSize = RAW_HID_PAYLOAD_SIZE - PROTOCOL_HEADER_SIZE;
+  memcpy(&startPacket[3], &dataToSend[0], firstChunkSize);
+  RawHID.write(startPacket, RAW_HID_PAYLOAD_SIZE);
+  bytesSent += firstChunkSize;
+
+  delay(5); // Crucial delay for the PC to process the packet
+
+  // --- Send RESPONSE_DATA_PACKETs ---
+  while (bytesSent < 400) {
+    uint8_t dataPacket[RAW_HID_PAYLOAD_SIZE] = {0};
+    dataPacket[0] = CMD_RESPONSE_DATA_PACKET;
+
+    int chunkSize = min(RAW_HID_PAYLOAD_SIZE - 1, 400 - bytesSent);
+    memcpy(&dataPacket[1], &dataToSend[bytesSent], chunkSize);
+    
+    RawHID.write(dataPacket, RAW_HID_PAYLOAD_SIZE);
+    bytesSent += chunkSize;
+    
+    delay(5); // Delay between each packet
+  }
+  
+  Serial.println("Finished sending 400 bytes to PC.");
+}
+
+void processReceivedData() {
+  Serial.print("Successfully received ");
+  Serial.print(bytesReceived);
+  Serial.println(" bytes from PC.");
+  Serial.println("Printing first 20 bytes of the received message:");
+  
+  for (int i = 0; i < 20; i++) {
+    Serial.print("0x");
+    if (largeBuffer[i] < 0x10) Serial.print("0");
+    Serial.print(largeBuffer[i], HEX);
+    Serial.print(" ");
+  }
+  Serial.println();
 }
