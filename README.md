@@ -19,3 +19,6 @@ Keycaps
 
 Arduino simulator
 * https://wokwi.com/projects/new/arduino-uno
+
+Idea for v2:
+* https://github.com/dekuNukem/duckyPad-Pro
