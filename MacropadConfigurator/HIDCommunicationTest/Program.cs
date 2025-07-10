@@ -105,7 +105,7 @@ internal class Program
         Console.ReadKey();
     }
 
-    private static void InputReceiver_Received(object? sender, EventArgs e)
+    private static void InputReceiver_Received(object sender, EventArgs e)
     {
         var inputReceiver = (HidDeviceInputReceiver)sender;
         var report = new byte[reportLength];
