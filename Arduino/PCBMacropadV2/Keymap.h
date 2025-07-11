@@ -19,6 +19,7 @@ struct KeyAction {
 // Represents a full layer of 9 key actions AND a name
 struct Layer {
   char name[TEXT_LENGTH];
+  bool isEnabled;
   KeyAction actions[NUM_BUTTONS];
 };
 
@@ -28,6 +29,7 @@ inline void loadDefaultKeymap(Layer* layers) {
   // --- LAYER 0: Functions ---
   const Layer layer0_data = {
     "Funcs", // Layer Name
+    true,    // isEnabled
     { // Key Actions
       {KEY_F13, 0, "F13"}, {KEY_F14, 0, "F14"}, {KEY_F15, 0, "F15"},
       {KEY_F16, 0, "F16"}, {KEY_F17, 0, "F17"}, {KEY_F18, 0, "F18"},
@@ -42,6 +44,7 @@ inline void loadDefaultKeymap(Layer* layers) {
   // --- LAYER 1: Shortcuts ---
   const Layer layer1_data = {
     "Shrtcts", // Layer Name
+    true,    // isEnabled
     { // Key Actions
       {'c', MOD_LEFT_CTRL, "Copy"}, {'v', MOD_LEFT_CTRL, "Paste"}, {'x', MOD_LEFT_CTRL, "Cut"},
       {'z', MOD_LEFT_CTRL, "Undo"}, {'s', MOD_LEFT_CTRL, "Save"}, {'a', MOD_LEFT_CTRL, "SelectA"},
@@ -53,6 +56,7 @@ inline void loadDefaultKeymap(Layer* layers) {
   // --- LAYER 2: Media ---
   const Layer layer2_data = {
     "Media", // Layer Name
+    true,    // isEnabled
     { // Key Actions
       {MEDIA_VOLUME_MUTE, 0, "Mute"}, {MEDIA_VOLUME_DOWN, 0, "Vol-"}, {MEDIA_VOLUME_UP, 0, "Vol+"},
       {MEDIA_PREVIOUS, 0, "Prev"}, {MEDIA_PLAY_PAUSE, 0, "Play"}, {MEDIA_NEXT, 0, "Next"},

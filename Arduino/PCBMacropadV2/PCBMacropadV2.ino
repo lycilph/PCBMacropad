@@ -35,7 +35,7 @@ Keypad keypad = Keypad( makeKeymap(keys), colPins, rowPins, ROWS, COLS );
 // --- Global Objects ---
 Layer allLayers[NUM_LAYERS];
 ConfigManager configManager;
-Macropad macropad(allLayers, &encoderButton, &keypad, &display);
+Macropad macropad(allLayers, &keypad, &display);
 
 void setup() {
   Serial.begin(9600);
@@ -58,10 +58,39 @@ void setup() {
   configManager.loadConfig(allLayers);
   configManager.dumpCurrentConfig(allLayers); // Debug - comment out
 
+  // Setup for encoder button
+  encoderButton.setEncoderHandler(onEncoderEvent);
+  // eb->setClickHandler(onEncoderClick);
+  // eb->setLongPressHandler(onEncoderLongClick);
+
   // Initialize the macropad logic
   macropad.begin();
 }
 
 void loop() {
+  // Call 'update' for every EncoderButton
+  encoderButton.update();
+
+  macropad.update();
 }
 
+
+void onEncoderEvent(EncoderButton& eb) {
+  int incr = eb.increment();
+  if (incr > 0)
+  {
+    Consumer.write(MEDIA_VOLUME_DOWN);
+  }
+  else if (incr < 0)
+  {
+    Consumer.write(MEDIA_VOLUME_UP);
+  }
+}
+
+void onEncoderClick(EncoderButton& eb) {
+  Consumer.write(MEDIA_PLAY_PAUSE);
+}
+
+void onEncoderLongClick(EncoderButton& eb) {
+  macropad.switchToNextLayer();
+}
