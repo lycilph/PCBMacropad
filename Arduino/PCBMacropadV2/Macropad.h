@@ -1,13 +1,14 @@
 #pragma once
-#include "Keymap.h"
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
+
 #include <Keypad.h>
 #include <EncoderButton.h>
 
+#include "Keymap.h"
+#include "TinyOLED.h"
+
 class Macropad {
 public:
-  Macropad(Layer* layerData, Keypad *keypad, Adafruit_SSD1306* oled);
+  Macropad(Layer* layerData, Keypad *keypad, TinyOLED* oled);
 
   void begin();
   void update();  
@@ -23,7 +24,7 @@ private:
 
   Layer* layers;
   Keypad *kp;
-  Adafruit_SSD1306* display;
+  TinyOLED* display;
 
   int currentLayer;
   unsigned long keyHeldTime[LIST_MAX]; // Keep a list of how long each key is held
@@ -37,5 +38,5 @@ private:
   // Display invert color timer
   bool invertOled = false;
   unsigned long invertOledTimestamp;
-  unsigned long invertOledDuration = 300L * 1000; // Should work out to 5 min :-)
+  const unsigned long invertOledDuration = 5 * 60 * 1000; // Should work out to 5 min :-)
 };
