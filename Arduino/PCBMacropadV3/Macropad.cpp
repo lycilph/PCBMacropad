@@ -68,7 +68,7 @@ void Macropad::update() {
       if (keypad->key[i].stateChanged && keypad->key[i].kstate == PRESSED)
       {
         Serial.println(keypad->key[i].kchar);
-        //HandleSingleKey(keypad.key[i].kchar);
+        executeAction(keypad->key[i].kchar - 49);
       }
     }
   }
@@ -79,10 +79,30 @@ void Macropad::update() {
     {
       Serial.print(keypad->key[i].kchar);
       Serial.println(" - held");
-      //HandleSingleKey(keypad.key[i].kchar);
+      executeAction(keypad->key[i].kchar - 49);
+
       keyHeldTime[i] = millis();
     }
   }
+}
+
+void Macropad::executeAction(int buttonIndex) {
+  KeyAction action = layers[currentLayer].actions[buttonIndex];
+
+  Serial.print("Button: "); Serial.print(action.key); Serial.print(" - "); Serial.print(action.modifier); Serial.print(" - "); Serial.println(action.text);
+  delay(250);
+  
+  if (action.modifier & MOD_LEFT_CTRL) Keyboard.press(KEY_LEFT_CTRL);
+  if (action.modifier & MOD_LEFT_SHIFT) Keyboard.press(KEY_LEFT_SHIFT);
+  if (action.modifier & MOD_LEFT_ALT) Keyboard.press(KEY_LEFT_ALT);
+  if (action.modifier & MOD_LEFT_GUI) Keyboard.press(KEY_LEFT_GUI);
+  if (action.modifier & MOD_RIGHT_CTRL) Keyboard.press(KEY_RIGHT_CTRL);
+  if (action.modifier & MOD_RIGHT_SHIFT) Keyboard.press(KEY_RIGHT_SHIFT);
+  if (action.modifier & MOD_RIGHT_ALT) Keyboard.press(KEY_RIGHT_ALT);
+  if (action.modifier & MOD_RIGHT_GUI) Keyboard.press(KEY_RIGHT_GUI);
+
+  Keyboard.press(action.key);
+  Keyboard.releaseAll();
 }
 
 void Macropad::changeLayer(int newLayer) {

@@ -15,7 +15,7 @@ public:
   void switchToNextLayer();
 
 private:
-  // void executeAction(int buttonIndex);
+  void executeAction(int buttonIndex);
   void changeLayer(int newLayer); 
   int findNextEnabledLayer();
   
@@ -30,6 +30,6 @@ private:
   // Display invert color timer
   bool invertOled = false;
   unsigned long invertOledTimestamp;
-  // const unsigned long invertOledDuration = 5 * 60 * 1000; // Should work out to 5 min :-)
-  const unsigned long invertOledDuration = 1000; // Should work out to 5 min :-)
+  const unsigned long invertOledDuration = 5 * 60 * 1000; // Should work out to 5 min :-)
+  // const unsigned long invertOledDuration = 1000; // Should work out to 5 min :-)
 };

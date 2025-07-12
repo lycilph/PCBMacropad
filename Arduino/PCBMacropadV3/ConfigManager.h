@@ -18,6 +18,6 @@ public:
   void dumpCurrentConfig(Layer* layers);
 
 private:
-  const int EEPROM_VERSION = 1; // Change this if you update the struct layout
+  const int EEPROM_VERSION = 2; // Change this if you update the struct layout
   const int EEPROM_ADDRESS = 0;
 };

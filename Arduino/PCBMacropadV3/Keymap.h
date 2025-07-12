@@ -29,7 +29,7 @@ inline void loadDefaultKeymap(Layer* layers) {
     "Functions", // Layer Name
     true,    // isEnabled
     { // Key Actions
-      {KEY_F13, 0, "F13"}, {KEY_F14, 0, "F14"}, {KEY_F15, 0, "F15"},
+      {'c', MOD_LEFT_CTRL, "Copy"}, {'v', MOD_LEFT_CTRL, "Paste"}, {KEY_F15, 0, "F15"},
       {KEY_F16, 0, "F16"}, {KEY_F17, 0, "F17"}, {KEY_F18, 0, "F18"},
       {KEY_ESC, MOD_LEFT_CTRL | MOD_LEFT_SHIFT, "T.Mgr"}, 
       {'x', MOD_LEFT_CTRL | MOD_LEFT_SHIFT | MOD_LEFT_ALT, "CSA+X"},

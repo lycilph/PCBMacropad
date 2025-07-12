@@ -43,6 +43,10 @@ ConfigManager configManager;
 Macropad macropad(allLayers, &keypad, &display);
 
 void setup() {
+  Serial.begin(9600);
+  // Wait a moment for serial to connect if needed
+  while (!Serial); 
+  
   // Start the U8g2 library. This also initializes the I2C communication.
   display.begin();
   displayStart();
@@ -106,6 +110,7 @@ void handleSerialCommands() {
         DEBUG_PRINTLN("Performing factory reset...");
         configManager.factoryReset(allLayers);
         configManager.saveConfig(allLayers);
+        delay(500);
         macropad.updateDisplay();
         DEBUG_PRINTLN("Reset complete.");
     }
