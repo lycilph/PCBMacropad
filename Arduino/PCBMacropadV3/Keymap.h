@@ -11,7 +11,7 @@ const int LAYER_TEXT_LENGTH = 12;
 // --- Data Structures ---
 struct KeyAction
 {
-   uint8_t key;
+   KeyboardKeycode key;
    uint16_t modifier;
    char text[BUTTON_TEXT_LENGTH];
 };
@@ -29,10 +29,10 @@ inline void loadDefaultKeymap(Layer* layers) {
     "Functions", // Layer Name
     true,    // isEnabled
     { // Key Actions
-      {'c', MOD_LEFT_CTRL, "Copy"}, {'v', MOD_LEFT_CTRL, "Paste"}, {KEY_F15, 0, "F15"},
-      {KEY_F16, 0, "F16"}, {KEY_F17, 0, "F17"}, {KEY_F18, 0, "F18"},
+      {KEY_C, MOD_LEFT_CTRL, "Copy"}, {KEY_V, MOD_LEFT_CTRL, "Paste"}, {KEY_F15, 0, "F15"},
+      {KEY_F16, 0, "F16"}, {KEY_F16, MOD_LEFT_SHIFT, "S+F16"}, {KEY_F18, 0, "F18"},
       {KEY_ESC, MOD_LEFT_CTRL | MOD_LEFT_SHIFT, "T.Mgr"}, 
-      {'x', MOD_LEFT_CTRL | MOD_LEFT_SHIFT | MOD_LEFT_ALT, "CSA+X"},
+      {KEY_X, MOD_LEFT_CTRL | MOD_LEFT_SHIFT | MOD_LEFT_ALT, "CSA+X"},
       {KEY_F21, 0, "F21"}
     }
   };
@@ -56,8 +56,8 @@ inline void loadDefaultKeymap(Layer* layers) {
     "Media", // Layer Name
     true,    // isEnabled
     { // Key Actions
-      {MEDIA_VOLUME_MUTE, 0, "Mute"}, {MEDIA_VOLUME_DOWN, 0, "Vol-"}, {MEDIA_VOLUME_UP, 0, "Vol+"},
-      {MEDIA_PREVIOUS, 0, "Prev"}, {MEDIA_PLAY_PAUSE, 0, "Play"}, {MEDIA_NEXT, 0, "Next"},
+      {KEY_A, 0, "Mute"}, {KEY_B, 0, "Vol-"}, {KEY_C, 0, "Vol+"},
+      {KEY_D, 0, "Prev"}, {KEY_E, 0, "Play"}, {KEY_F, 0, "Next"},
       {KEY_ESC, 0, "Esc"}, {KEY_TAB, 0, "Tab"}, {'l', MOD_LEFT_GUI, "Lock"}
     }
   };

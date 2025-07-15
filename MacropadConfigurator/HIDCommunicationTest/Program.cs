@@ -8,8 +8,8 @@ internal class Program
 {
     // These must match the device's VID/PID.
     // The defaults for HID-Project's RawHID are:
-    const int VendorId = 0x2341;
-    const int ProductId = 0x8036;
+    const int VendorId = 0x1B4F;
+    const int ProductId = 0x9206;
 
     // The Report ID for RawHID input from the HID-Project library
     const int RawHidInputReportId = 0;
@@ -42,15 +42,16 @@ internal class Program
         }
 
         Console.WriteLine("Device found! Attempting to open stream...");
+        
+
+        if (device.TryOpen(out var stream))
+        {
 
         // HidSharp streams must be opened with a try/catch block
         reportLength = device.GetMaxOutputReportLength();
         var reportDescriptor = device.GetReportDescriptor();
         var inputReceiver = reportDescriptor.CreateHidDeviceInputReceiver();
-        
 
-        if (device.TryOpen(out var stream))
-        {
             using (stream)
             {
                 Console.WriteLine("Stream opened successfully.");

@@ -8,14 +8,12 @@ public:
   void begin();
   
   void loadConfig(Layer* layers);
-  void saveConfig(const Layer* layers);
+  void saveConfig(Layer* layers);
   
   void factoryReset(Layer* layers);
 
   size_t serializeConfig(const Layer* layers, uint8_t* buffer, size_t bufferSize);
   bool deserializeConfig(Layer* layers, const uint8_t* buffer, size_t bufferSize);
-
-  void dumpCurrentConfig(Layer* layers);
 
 private:
   const int EEPROM_VERSION = 2; // Change this if you update the struct layout

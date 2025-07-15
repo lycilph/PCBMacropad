@@ -1,21 +1,10 @@
 #include <EncoderButton.h>
+#include <LowPower.h>
 
 #include "Keymap.h"
 #include "ConfigManager.h"
 #include "Macropad.h"
-
-// --- Debug Configuration ---
-// Comment out this line for the final build to save ~1.5KB of flash memory
-#define ENABLE_DEBUG
-
-#ifdef ENABLE_DEBUG
-  #define DEBUG_PRINT(...) Serial.print(__VA_ARGS__)
-  #define DEBUG_PRINTLN(...) Serial.println(__VA_ARGS__)
-#else
-  // The empty definitions also need to be variadic
-  #define DEBUG_PRINT(...)
-  #define DEBUG_PRINTLN(...)
-#endif
+#include "config.h"
 
 U8G2_SSD1306_128X64_NONAME_1_HW_I2C display(U8G2_R2, /* reset=*/ U8X8_PIN_NONE);
 
@@ -42,14 +31,23 @@ Layer allLayers[NUM_LAYERS];
 ConfigManager configManager;
 Macropad macropad(allLayers, &keypad, &display);
 
+bool hasSlept = false;
+
 void setup() {
-  Serial.begin(9600);
-  // Wait a moment for serial to connect if needed
-  while (!Serial); 
+  #ifdef ENABLE_SERIAL
+    Serial.begin(9600);
+    // Wait a moment for serial to connect if needed
+    while (!Serial); 
+  #endif
   
   // Start the U8g2 library. This also initializes the I2C communication.
   display.begin();
   displayStart();
+  
+  // Setup for encoder button
+  encoderButton.setEncoderHandler(onEncoderEvent);
+  encoderButton.setClickHandler(onEncoderClick);
+  encoderButton.setLongPressHandler(onEncoderLongClick);
 
   configManager.begin();
   configManager.loadConfig(allLayers);
@@ -57,9 +55,36 @@ void setup() {
   macropad.begin();
   macropad.updateDisplay();
 
-  DEBUG_PRINTLN("Macropad Initialized.");
-  DEBUG_PRINTLN("Send 'd' to dump config.");
-  DEBUG_PRINTLN("Send 'r' for factory reset.");
+  DEBUG_PRINTLN(F("Macropad Initialized"));
+  DEBUG_PRINTLN(F("Send 'd' to dump config"));
+  DEBUG_PRINTLN(F("Send 'r' for factory reset"));
+  DEBUG_PRINTLN(F("Send 'f' to check ram"));
+}
+
+void loop() {
+  if (USBDevice.isSuspended())
+  {
+    display.clear();
+    delay(500);
+
+    LowPower.idle(SLEEP_8S, ADC_OFF, TIMER4_OFF, TIMER3_OFF, TIMER1_OFF, TIMER0_OFF, SPI_OFF, USART1_OFF, TWI_OFF, USB_OFF);
+    hasSlept = true;
+  }
+
+  if (hasSlept && USBDevice.isSuspended() == false)
+  {
+    hasSlept = false;
+    macropad.updateDisplay();
+  }
+
+  macropad.update();
+  
+  // Call 'update' for every EncoderButton
+  encoderButton.update();
+
+  #ifdef ENABLE_SERIAL
+    handleSerialCommands();
+  #endif
 }
 
 void displayStart()
@@ -74,45 +99,75 @@ void displayStart()
   } while (display.nextPage()); // Sends the completed "page" to the display and loops
 
   // Add a delay so the screen doesn't refresh constantly in this example
-  delay(2000);
+  delay(1000);
 }
 
-void loop() {
-  macropad.update();
-
-  handleSerialCommands();
-}
-
-void handleSerialCommands() {
-  if (Serial.available() > 0) {
-    char command = Serial.read();
-
-    if (command == 'd') { // 'd' for Dump
-      const size_t configSize = sizeof(Layer) * NUM_LAYERS;
-      uint8_t serialBuffer[configSize];
-      size_t bytesWritten = configManager.serializeConfig(allLayers, serialBuffer, configSize);
-
-      if (bytesWritten > 0) {
-        DEBUG_PRINTLN("--- BEGIN CONFIG DUMP ---");
-        for (size_t i = 0; i < bytesWritten; i++) {
-          if (serialBuffer[i] < 0x10) DEBUG_PRINT("0");
-          DEBUG_PRINT(serialBuffer[i], HEX);
-          DEBUG_PRINT(" ");
-        }
-        DEBUG_PRINTLN();
-        DEBUG_PRINTLN("--- END CONFIG DUMP ---");
-      } else {
-        DEBUG_PRINTLN("Error: Serialization failed.");
-      }
-    }
-    
-    if (command == 'r') { // 'r' for Reset
-        DEBUG_PRINTLN("Performing factory reset...");
-        configManager.factoryReset(allLayers);
-        configManager.saveConfig(allLayers);
-        delay(500);
-        macropad.updateDisplay();
-        DEBUG_PRINTLN("Reset complete.");
-    }
+void onEncoderEvent(EncoderButton& eb) {
+  int incr = eb.increment();
+  if (incr > 0)
+  {
+    Consumer.write(MEDIA_VOLUME_DOWN);
+  }
+  else if (incr < 0)
+  {
+    Consumer.write(MEDIA_VOLUME_UP);
   }
 }
+
+void onEncoderClick(EncoderButton& eb) {
+  Consumer.write(MEDIA_PLAY_PAUSE);
+}
+
+void onEncoderLongClick(EncoderButton& eb) {
+  macropad.switchToNextLayer();
+}
+
+#ifdef ENABLE_SERIAL
+  void handleSerialCommands() {
+    if (Serial.available() > 0) {
+      char command = Serial.read();
+
+      #ifdef ENABLE_FREERAM_CHECK
+        Serial.print(F("Free SRAM: "));
+        Serial.println(freeMemory());
+      #endif
+      
+      if (command == 'd') { // 'd' for Dump
+        const size_t configSize = sizeof(Layer) * NUM_LAYERS;
+        uint8_t serialBuffer[configSize];
+        size_t bytesWritten = configManager.serializeConfig(allLayers, serialBuffer, configSize);
+
+        if (bytesWritten > 0) {
+          DEBUG_PRINTLN(F("--- BEGIN CONFIG DUMP ---"));
+          DEBUG_PRINT(F("Size of config: ")); DEBUG_PRINTLN(configSize);
+          for (size_t i = 0; i < bytesWritten; i++) {
+            if (serialBuffer[i] < 0x10) DEBUG_PRINT("0");
+            DEBUG_PRINT(serialBuffer[i], HEX);
+            DEBUG_PRINT(" ");
+          }
+          DEBUG_PRINTLN();
+          DEBUG_PRINTLN(F("--- END CONFIG DUMP ---"));
+        } else {
+          DEBUG_PRINTLN(F("Error: Serialization failed."));
+        }
+      }
+      
+      if (command == 'r') { // 'r' for Reset
+          DEBUG_PRINTLN(F("Performing factory reset..."));
+          configManager.factoryReset(allLayers);
+          configManager.saveConfig(allLayers);
+          delay(500);
+          macropad.updateDisplay();
+          DEBUG_PRINTLN(F("Reset complete"));
+      }
+    }
+  }
+#endif
+
+#ifdef ENABLE_FREERAM_CHECK
+  int freeMemory() {
+    extern int __heap_start, *__brkval;
+    int v;
+    return (int)&v - (__brkval == 0 ? (int)&__heap_start : (int)__brkval);
+  }
+#endif

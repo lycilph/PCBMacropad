@@ -1,5 +1,8 @@
 #include <EEPROM.h>
+#include <Wire.h>
+
 #include "ConfigManager.h"
+#include "config.h"
 
 ConfigManager::ConfigManager() {}
 
@@ -8,24 +11,45 @@ void ConfigManager::begin() {
 }
 
 void ConfigManager::loadConfig(Layer* layers) {
-  // Check if a valid configuration is stored
-  // We use a "magic number" or version at the start of the EEPROM
-  if (EEPROM.read(EEPROM_ADDRESS) == EEPROM_VERSION) {
-    Serial.println("Loading config from eeprom");
-    // Valid config found, load it
-    EEPROM.get(EEPROM_ADDRESS + 1, *layers);
+  int storedVersion = 0;
+  EEPROM.get(EEPROM_ADDRESS, storedVersion);
+
+  if (storedVersion == EEPROM_VERSION) {
+    DEBUG_PRINTLN(F("Valid EEPROM config found. Loading via deserialization..."));
+
+    const size_t dataSize = sizeof(Layer) * NUM_LAYERS;
+    uint8_t buffer[dataSize]; // Create a temporary buffer
+
+    // Read the raw bytes from EEPROM into our buffer
+    EEPROM.get(EEPROM_ADDRESS + sizeof(EEPROM_VERSION), *buffer);
+    
+    // Use our function to parse the buffer and populate the layers struct
+    if (!deserializeConfig(layers, buffer, dataSize)) {
+      // This should ideally never happen if version matches
+      DEBUG_PRINTLN(F("ERROR: Deserialization failed! Performing factory reset."));
+      factoryReset(layers);
+      saveConfig(layers);
+    }
   } else {
-    Serial.println("Factory new config");
-    // No valid config, load defaults and save them
+    DEBUG_PRINTLN(F("Invalid version. Performing factory reset"));
     factoryReset(layers);
     saveConfig(layers);
   }
+
 }
 
-void ConfigManager::saveConfig(const Layer* layers) {
-  Serial.println("Saving config");
-  EEPROM.put(EEPROM_ADDRESS, EEPROM_VERSION);
-  EEPROM.put(EEPROM_ADDRESS + 1, *layers);
+void ConfigManager::saveConfig(Layer* layers) {
+  DEBUG_PRINTLN(F("Saving config using serialization..."));
+
+  EEPROM.put(EEPROM_ADDRESS, EEPROM_VERSION); // Simpler and should work for a basic type like int.
+  
+  // --- Serialize and Save Layer Data ---
+  const size_t dataSize = sizeof(Layer) * NUM_LAYERS;
+  uint8_t buffer[dataSize]; // Create a temporary buffer on the stack
+  serializeConfig(layers, buffer, dataSize);
+  EEPROM.put(EEPROM_ADDRESS+ sizeof(EEPROM_VERSION), buffer);
+
+  DEBUG_PRINTLN(F("Saving config done."));
 }
 
 void ConfigManager::factoryReset(Layer* layers) {
@@ -58,30 +82,4 @@ bool ConfigManager::deserializeConfig(Layer* layers, const uint8_t* buffer, size
   memcpy(layers, buffer, expectedDataSize);
 
   return true;
-}
-
-void ConfigManager::dumpCurrentConfig(Layer* layers)
-{
-  // Create a buffer exactly the size of our configuration data
-  const size_t configSize = sizeof(Layer) * NUM_LAYERS;
-  uint8_t serialBuffer[configSize];
-
-  // Serialize the current configuration into our buffer
-  size_t bytesWritten = serializeConfig(layers, serialBuffer, configSize);
-
-  if (bytesWritten > 0) {
-    Serial.println("--- BEGIN CONFIG DUMP ---");
-    // Print the byte array in HEX format so it's readable
-    for (size_t i = 0; i < bytesWritten; i++) {
-      if (serialBuffer[i] < 0x10) {
-        Serial.print("0"); // Add leading zero for single-digit hex
-      }
-      Serial.print(serialBuffer[i], HEX);
-      Serial.print(" ");
-    }
-    Serial.println();
-    Serial.println("--- END CONFIG DUMP ---");
-  } else {
-    Serial.println("Error: Serialization failed.");
-  }
 }

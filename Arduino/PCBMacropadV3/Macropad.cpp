@@ -1,4 +1,5 @@
 #include "Macropad.h"
+#include "config.h"
 
 Macropad::Macropad(Layer* layerData, Keypad* keypad, U8G2_SSD1306_128X64_NONAME_1_HW_I2C* display)
   : layers(layerData), keypad(keypad), display(display), currentLayer(0) {}
@@ -67,7 +68,7 @@ void Macropad::update() {
     {
       if (keypad->key[i].stateChanged && keypad->key[i].kstate == PRESSED)
       {
-        Serial.println(keypad->key[i].kchar);
+        DEBUG_PRINTLN(keypad->key[i].kchar);
         executeAction(keypad->key[i].kchar - 49);
       }
     }
@@ -77,8 +78,8 @@ void Macropad::update() {
   {
     if (keypad->key[i].kstate == HOLD && (millis() - keyHeldTime[i]) > 100)
     {
-      Serial.print(keypad->key[i].kchar);
-      Serial.println(" - held");
+      DEBUG_PRINT(keypad->key[i].kchar);
+      DEBUG_PRINTLN(F(" - held"));
       executeAction(keypad->key[i].kchar - 49);
 
       keyHeldTime[i] = millis();
@@ -89,8 +90,7 @@ void Macropad::update() {
 void Macropad::executeAction(int buttonIndex) {
   KeyAction action = layers[currentLayer].actions[buttonIndex];
 
-  Serial.print("Button: "); Serial.print(action.key); Serial.print(" - "); Serial.print(action.modifier); Serial.print(" - "); Serial.println(action.text);
-  delay(250);
+  DEBUG_PRINTLN(action.text);
   
   if (action.modifier & MOD_LEFT_CTRL) Keyboard.press(KEY_LEFT_CTRL);
   if (action.modifier & MOD_LEFT_SHIFT) Keyboard.press(KEY_LEFT_SHIFT);
@@ -111,6 +111,7 @@ void Macropad::changeLayer(int newLayer) {
 }
 
 void Macropad::switchToNextLayer() {
+  DEBUG_PRINTLN(F("Switching layer"));
   changeLayer(findNextEnabledLayer());
 }
 
