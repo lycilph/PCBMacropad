@@ -1,12 +1,15 @@
-﻿using System.Collections.ObjectModel;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using MacropadConfigurator.Models;
 using MacropadConfigurator.Services;
+using NLog;
+using System.Collections.ObjectModel;
 
 namespace MacropadConfigurator.ViewModels;
 
-public partial class ConfigurationViewModel : ObservableObject
+public partial class ConfigurationViewModel : ObservableObject, ILoadedAware
 {
+    private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+
     private readonly MacropadManager macropadManager;
 
     [ObservableProperty]
@@ -25,5 +28,10 @@ public partial class ConfigurationViewModel : ObservableObject
         layers = macropadManager.Layers;
         SelectedLayer = Layers.First();
         SelectedButton = SelectedLayer.Buttons.First();
+    }
+
+    public void OnLoaded()
+    {
+        logger.Info("ConfigurationViewModel loaded");
     }
 }

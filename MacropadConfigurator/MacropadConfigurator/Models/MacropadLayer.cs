@@ -9,6 +9,9 @@ public partial class MacropadLayer : ObservableObject
     [ObservableProperty]
     private string name = string.Empty;
 
+    [ObservableProperty]
+    private bool isEnabled = false;
+
     public ObservableCollection<MacropadButton> Buttons { get; private set; }
 
     public MacropadLayer()

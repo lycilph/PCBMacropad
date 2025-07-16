@@ -1,9 +1,6 @@
 ﻿using HidSharp;
-using HidSharp.Reports;
 using HidSharp.Reports.Input;
-using System.IO;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace HidCommunicationTestV4;
 

@@ -24,12 +24,17 @@
                  Content="{Binding ConfigurationViewModel}"/>
         </TabControl>
 
+        <Rectangle Grid.Row="0"
+                   Fill="Gray"
+                   Opacity="0.65"
+                   Visibility="{Binding ShowOverlay, Converter={StaticResource bool_to_visibilty_converter}}"/>
+
         <Border Grid.Row="1"
-            BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
-            BorderThickness="1"
-            Margin="2"
-            Padding="2"
-            CornerRadius="2">
+                    BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
+                    BorderThickness="1"
+                    Margin="2"
+                    Padding="2"
+                    CornerRadius="2">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <ItemsControl behavior:ScrollViewerBehavior.AutoScroll="True"
                               ItemsSource="{Binding Log}"/>

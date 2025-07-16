@@ -36,7 +36,7 @@ const int PROTOCOL_HEADER_SIZE = 3; // 1 byte for command, 2 for total size
 
 // --- RawHID Buffer ---
 const int MAX_BUFFER_SIZE = 512;
-uint8_t rawhidData[255];
+uint8_t rawhidData[150];
 uint8_t configDataBuffer[CONFIG_DATA_SIZE];
 uint16_t totalDataSize = 0;
 uint16_t bytesReceived = 0;
