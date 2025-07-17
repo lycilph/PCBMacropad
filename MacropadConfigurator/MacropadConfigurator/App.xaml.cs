@@ -38,6 +38,7 @@ public partial class App : Application
         services.AddSingleton<ApplicationManager>();
         services.AddSingleton<ShortcutManager>();
         services.AddSingleton<MacropadManager>();
+        services.AddSingleton<CommunicationManager>();
         services.AddSingleton<SettingsService>();
         services.AddSingleton<CompilerService>();
 

@@ -27,6 +27,8 @@ void CommunicationManager::update() {
     }  else if (command == CMD_PC_CONFIG_DATA) {
       handleConfigData();
     }
+    // Add a command to reset the macropad
+    // Should call the factoryReset in the config manager class (and save the reset config to eeprom)
 
     #ifdef ENABLE_FREERAM_CHECK
       Serial.print(F("Free SRAM: "));
@@ -68,6 +70,12 @@ void CommunicationManager::handleGetConfig() {
   }
 }
 
-void CommunicationManager::handleSetConfig() {}
+void CommunicationManager::handleSetConfig() {
+  // Allocate buffer for the incoming configuration here (see https://cplusplus.com/reference/cstdlib/malloc/)
+  // Check that there is enough free ram before and after....
+}
 
-void CommunicationManager::handleConfigData() {}
+void CommunicationManager::handleConfigData() {
+  // When done free the allocated buffer (see https://cplusplus.com/reference/cstdlib/free/)
+  // Check that there is enough free ram before and after....
+}

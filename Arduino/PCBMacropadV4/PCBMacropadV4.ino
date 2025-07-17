@@ -5,7 +5,7 @@
 #include "ConfigManager.h"
 #include "Macropad.h"
 #include "config.h"
-#include "CommunicationManager.h"
+//#include "CommunicationManager.h"
 
 U8G2_SSD1306_128X64_NONAME_1_HW_I2C display(U8G2_R2, /* reset=*/ U8X8_PIN_NONE);
 
@@ -31,7 +31,7 @@ Keypad keypad = Keypad( makeKeymap(keys), colPins, rowPins, ROWS, COLS );
 Layer allLayers[NUM_LAYERS];
 ConfigManager configManager;
 Macropad macropad(allLayers, &keypad, &display);
-CommunicationManager communicationManager(allLayers);
+//CommunicationManager communicationManager(allLayers);
 
 bool hasSlept = false;
 
@@ -42,6 +42,11 @@ void setup() {
     while (!Serial); 
   #endif
   
+  #ifdef ENABLE_FREERAM_CHECK
+    Serial.print(F("Free SRAM: "));
+    Serial.println(freeMemory());
+  #endif
+
   // Start the U8g2 library. This also initializes the I2C communication.
   display.begin();
   displayStart();
@@ -57,6 +62,11 @@ void setup() {
   macropad.begin();
   macropad.updateDisplay();
 
+  #ifdef ENABLE_FREERAM_CHECK
+    Serial.print(F("Free SRAM: "));
+    Serial.println(freeMemory());
+  #endif
+  
   DEBUG_PRINTLN(F("Macropad Initialized"));
   DEBUG_PRINTLN(F("Send 'd' to dump config"));
   DEBUG_PRINTLN(F("Send 'r' for factory reset"));

@@ -1,6 +1,5 @@
 ﻿using MacropadConfigurator.ViewModels;
 using Microsoft.Xaml.Behaviors;
-using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -28,11 +27,12 @@ public class LoadedBehavior : Behavior<UserControl>
             AssociatedObject.Loaded -= AssociatedObjectLoading;
     }
 
-    private void AssociatedObjectLoading(object? sender, RoutedEventArgs e)
+    private void AssociatedObjectLoading(object sender, RoutedEventArgs e)
     {
         if (AssociatedObject.DataContext is ILoadedAware vm)
         {
             vm.OnLoaded();
         }
     }
+
 }
