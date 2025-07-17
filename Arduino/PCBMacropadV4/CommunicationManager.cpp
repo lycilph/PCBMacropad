@@ -53,6 +53,8 @@ void CommunicationManager::handleGetConfig() {
   RawHID.write(packetBuffer, RAW_HID_PAYLOAD_SIZE);
   bytesSent += firstChunkSize;
 
+  Serial.println("First packet sent");
+
   delay(5); // Crucial delay for the PC to process the packet
 
   // --- Send RESPONSE_DATA_PACKETs ---
@@ -65,6 +67,8 @@ void CommunicationManager::handleGetConfig() {
     
     RawHID.write(packetBuffer, RAW_HID_PAYLOAD_SIZE);
     bytesSent += chunkSize;
+
+    Serial.println("Data packet sent");
 
     delay(5); // Crucial delay for the PC to process the packet
   }

@@ -21,7 +21,7 @@ void ConfigManager::loadConfig(Layer* layers) {
     uint8_t buffer[dataSize]; // Create a temporary buffer
 
     // Read the raw bytes from EEPROM into our buffer
-    EEPROM.get(EEPROM_ADDRESS + sizeof(EEPROM_VERSION), *buffer);
+    EEPROM.get(EEPROM_ADDRESS + sizeof(EEPROM_VERSION), buffer);
     
     // Use our function to parse the buffer and populate the layers struct
     if (!deserializeConfig(layers, buffer, dataSize)) {

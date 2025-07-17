@@ -16,6 +16,6 @@ public:
   bool deserializeConfig(Layer* layers, const uint8_t* buffer, size_t bufferSize);
 
 private:
-  const int EEPROM_VERSION = 2; // Change this if you update the struct layout
+  const int EEPROM_VERSION = 3; // Change this if you update the struct layout
   const int EEPROM_ADDRESS = 0;
 };

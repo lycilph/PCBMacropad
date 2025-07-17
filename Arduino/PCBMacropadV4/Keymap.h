@@ -44,9 +44,9 @@ inline void loadDefaultKeymap(Layer* layers) {
     "Shortcuts", // Layer Name
     true,    // isEnabled
     { // Key Actions
-      {'c', MOD_LEFT_CTRL, "Copy"}, {'v', MOD_LEFT_CTRL, "Paste"}, {'x', MOD_LEFT_CTRL, "Cut"},
-      {'z', MOD_LEFT_CTRL, "Undo"}, {'s', MOD_LEFT_CTRL, "Save"}, {'a', MOD_LEFT_CTRL, "Sel.A"},
-      {KEY_DELETE, 0, "Del."},  {KEY_ENTER, 0, "Enter"},   {'p', MOD_LEFT_GUI, "Proj"}
+      {KEY_C, MOD_LEFT_CTRL, "Copy"}, {KEY_V, MOD_LEFT_CTRL, "Paste"}, {KEY_X, MOD_LEFT_CTRL, "Cut"},
+      {KEY_Z, MOD_LEFT_CTRL, "Undo"}, {KEY_S, MOD_LEFT_CTRL, "Save"}, {KEY_A, MOD_LEFT_CTRL, "Sel.A"},
+      {KEY_DELETE, 0, "Del."},  {KEY_ENTER, 0, "Enter"},   {KEY_P, MOD_LEFT_GUI, "Proj"}
     }
   };
   layers[1] = layer1_data;
@@ -58,7 +58,7 @@ inline void loadDefaultKeymap(Layer* layers) {
     { // Key Actions
       {KEY_A, 0, "Mute"}, {KEY_B, 0, "Vol-"}, {KEY_C, 0, "Vol+"},
       {KEY_D, 0, "Prev"}, {KEY_E, 0, "Play"}, {KEY_F, 0, "Next"},
-      {KEY_ESC, 0, "Esc"}, {KEY_TAB, 0, "Tab"}, {'l', MOD_LEFT_GUI, "Lock"}
+      {KEY_ESC, 0, "Esc"}, {KEY_TAB, 0, "Tab"}, {KEY_L, MOD_LEFT_GUI, "Lock"}
     }
   };
   layers[2] = layer2_data;

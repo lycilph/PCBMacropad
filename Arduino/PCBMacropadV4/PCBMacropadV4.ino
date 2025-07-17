@@ -5,9 +5,11 @@
 #include "ConfigManager.h"
 #include "Macropad.h"
 #include "config.h"
-//#include "CommunicationManager.h"
+#include "CommunicationManager.h"
 
-U8G2_SSD1306_128X64_NONAME_1_HW_I2C display(U8G2_R2, /* reset=*/ U8X8_PIN_NONE);
+// U8G2_SSD1306_128X64_NONAME_1_HW_I2C display(U8G2_R2, /* reset=*/ U8X8_PIN_NONE);
+#define I2C_ADDRESS 0x3C
+SSD1306AsciiAvrI2c display;
 
 // Rotary Encoder setup
 const int buttonPin = 7;
@@ -31,7 +33,7 @@ Keypad keypad = Keypad( makeKeymap(keys), colPins, rowPins, ROWS, COLS );
 Layer allLayers[NUM_LAYERS];
 ConfigManager configManager;
 Macropad macropad(allLayers, &keypad, &display);
-//CommunicationManager communicationManager(allLayers);
+CommunicationManager communicationManager(allLayers);
 
 bool hasSlept = false;
 
@@ -48,7 +50,7 @@ void setup() {
   #endif
 
   // Start the U8g2 library. This also initializes the I2C communication.
-  display.begin();
+  display.begin(&Adafruit128x64, I2C_ADDRESS);
   displayStart();
   
   // Setup for encoder button
@@ -58,9 +60,12 @@ void setup() {
 
   configManager.begin();
   configManager.loadConfig(allLayers);
+  delay(1000);
   
   macropad.begin();
   macropad.updateDisplay();
+
+  communicationManager.begin();
 
   #ifdef ENABLE_FREERAM_CHECK
     Serial.print(F("Free SRAM: "));
@@ -69,6 +74,7 @@ void setup() {
   
   DEBUG_PRINTLN(F("Macropad Initialized"));
   DEBUG_PRINTLN(F("Send 'd' to dump config"));
+  DEBUG_PRINTLN(F("Send 'p' to print layers"));
   DEBUG_PRINTLN(F("Send 'r' for factory reset"));
   DEBUG_PRINTLN(F("Send 'f' to check ram"));
 }
@@ -91,6 +97,7 @@ void loop() {
 
   macropad.update();
   encoderButton.update();
+  communicationManager.update();
 
   #ifdef ENABLE_SERIAL
     handleSerialCommands();
@@ -99,14 +106,9 @@ void loop() {
 
 void displayStart()
 {
-  display.firstPage();
-  do {
-    // --- START OF DRAWING COMMANDS ---
-    display.setDrawColor(1);
-    display.setFont(u8g2_font_profont12_tr);
-    display.drawStr(10, 40, "Starting...");
-    // --- END OF DRAWING COMMANDS ---
-  } while (display.nextPage()); // Sends the completed "page" to the display and loops
+  display.displayRemap(true); // Rotate display 180 deg
+  display.setCursor(30, 4);
+  display.print("Starting...");
 
   // Add a delay so the screen doesn't refresh constantly in this example
   delay(1000);
@@ -159,6 +161,15 @@ void onEncoderLongClick(EncoderButton& eb) {
           DEBUG_PRINTLN(F("--- END CONFIG DUMP ---"));
         } else {
           DEBUG_PRINTLN(F("Error: Serialization failed."));
+        }
+      }
+
+      if (command == 'p') { // 'p' for print
+        for (int i = 0; i < NUM_LAYERS; i++) {
+          DEBUG_PRINT("Layer: "); DEBUG_PRINT(allLayers[i].name); DEBUG_PRINT(" - enabled: "); DEBUG_PRINTLN(allLayers[i].isEnabled);
+          for (int j = 0; j < NUM_BUTTONS; j++) {
+            DEBUG_PRINT("Button "); DEBUG_PRINT(j); DEBUG_PRINT(" - Key: "); DEBUG_PRINT(allLayers[i].actions[j].key); DEBUG_PRINT(" - Modifier: "); DEBUG_PRINT(allLayers[i].actions[j].modifier); DEBUG_PRINT(" - Text: "); DEBUG_PRINTLN(allLayers[i].actions[j].text);
+          }
         }
       }
       

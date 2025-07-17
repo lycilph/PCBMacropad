@@ -67,6 +67,12 @@ public class CommunicationManager
             inputReceiver.Received += InputReceiver_Received;
             inputReceiver.Stopped += (s, e) => logger.Info("Input receiver stopped");
             inputReceiver.Start(stream);
+
+            Task.Delay(500).Wait(); // Wait for the receiver to start
+
+            var requestPacket = new byte[] { Constants.RawHidInputReportId, Constants.CMD_PC_GET_CONFIG };
+            logger.Info("Sending data request command to Arduino...");
+            stream.Write(requestPacket);
         }
     }
     private void InputReceiver_Received(object? sender, EventArgs e)
@@ -77,7 +83,7 @@ public class CommunicationManager
         var packet = new byte[reportLength];
 
         // While there are reports in the queue, process them.
-        while (inputReceiver.TryRead(packet, 0, out _))
+        while (inputReceiver.TryRead(packet, 0, out var report))
         {
             // The first byte is the Report ID. This is not set by the HID-Project library and is always 0 for RawHID.
             if (packet[0] != Constants.RawHidInputReportId)

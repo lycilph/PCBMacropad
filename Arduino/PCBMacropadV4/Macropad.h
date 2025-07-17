@@ -1,13 +1,14 @@
 #pragma once
 
 #include <Keypad.h>
-#include <U8g2lib.h>
+#include "SSD1306Ascii.h"
+#include "SSD1306AsciiAvrI2c.h"
 
 #include "Keymap.h"
 
 class Macropad {
 public:
-  Macropad(Layer* layerData, Keypad *keypad, U8G2_SSD1306_128X64_NONAME_1_HW_I2C* display);
+  Macropad(Layer* layerData, Keypad *keypad, SSD1306AsciiAvrI2c* display);
 
   void begin();
   void updateDisplay();
@@ -21,7 +22,7 @@ private:
   
   Layer* layers;
   Keypad* keypad;
-  U8G2_SSD1306_128X64_NONAME_1_HW_I2C* display;
+  SSD1306AsciiAvrI2c* display;
 
   // Misc variables
   int currentLayer;
