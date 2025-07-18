@@ -3,7 +3,7 @@ using HidSharp.Reports;
 using HidSharp.Reports.Input;
 using MacropadConfigurator.DTO;
 using NLog;
-using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace MacropadConfigurator.Services;
@@ -12,7 +12,7 @@ public class CommunicationManager
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-    public event EventHandler? ConfigurationLoaded;
+    public event EventHandler<MacropadConfigurationDTO> ConfigurationLoaded;
 
     private HidDevice? device = null;
     private HidStream? stream = null;
@@ -68,7 +68,12 @@ public class CommunicationManager
             inputReceiver.Stopped += (s, e) => logger.Info("Input receiver stopped");
             inputReceiver.Start(stream);
 
-            Task.Delay(500).Wait(); // Wait for the receiver to start
+            while(!inputReceiver.IsRunning)
+            {
+                // Wait for the receiver to start
+                Task.Delay(250).Wait();
+                logger.Info("Waiting for input receiver to start...");
+            }
 
             var requestPacket = new byte[] { Constants.RawHidInputReportId, Constants.CMD_PC_GET_CONFIG };
             logger.Info("Sending data request command to Arduino...");
@@ -83,27 +88,98 @@ public class CommunicationManager
         var packet = new byte[reportLength];
 
         // While there are reports in the queue, process them.
-        while (inputReceiver.TryRead(packet, 0, out var report))
+        while (inputReceiver.TryRead(packet, 0, out _/*var report*/))
         {
             // The first byte is the Report ID. This is not set by the HID-Project library and is always 0 for RawHID.
             if (packet[0] != Constants.RawHidInputReportId)
                 continue; // Not the report we are looking for
-            
+
             // The second byte is our actual command
             byte command = packet[1];
 
-            logger.Info("Packet: ");
-            var sb = new StringBuilder();
-            for (int i = 0; i < packet.Length; i++)
+            if (command == Constants.CMD_ARDUINO_SEND_CONFIG)
             {
-                sb.Append($"0x{packet[i]:X2} ");
+                receivedDataBuffer.Clear();
+                expectedBytesToReceive = packet[2] | (packet[3] << 8);
+
+                // The rest of the report is the first chunk of data
+                int dataLength = packet.Length - 4;
+                receivedDataBuffer.AddRange(packet.Skip(4).Take(dataLength));
+
+                Console.WriteLine($"\n[Listener] Received START_RESPONSE. Expecting {expectedBytesToReceive} bytes.");
             }
-            logger.Info(sb.ToString());
+            else if (command == Constants.CMD_ARDUINO_CONFIG_DATA && expectedBytesToReceive > 0)
+            {
+                int dataLength = packet.Length - 2;
+                receivedDataBuffer.AddRange(packet.Skip(2).Take(dataLength));
+            }
+
+            // Check if the transfer is complete
+            if (expectedBytesToReceive > 0 && receivedDataBuffer.Count >= expectedBytesToReceive)
+            {
+                logger.Info("--- Arduino->PC Transfer Complete! ---");
+                logger.Info($"Successfully received {receivedDataBuffer.Count} bytes.");
+
+                logger.Info($"Parsing config");
+                var config = ByteArrayToStruct<MacropadConfigurationDTO>(receivedDataBuffer.ToArray());
+                PrintConfig(config);
+                OnConfigurationLoaded(config);
+
+                // Reset for the next transfer and re-draw the menu prompt
+                expectedBytesToReceive = 0;
+                receivedDataBuffer.Clear();
+            }
         }
     }
 
-    protected void OnConfigurationLoaded()
+    protected void OnConfigurationLoaded(MacropadConfigurationDTO config)
     {
-        ConfigurationLoaded?.Invoke(this, EventArgs.Empty);
+        stream?.Close();
+        device = null;
+        ConfigurationLoaded?.Invoke(this, config);
+    }
+    private static byte[] StructToByteArray<T>(T obj)
+    {
+        int size = Marshal.SizeOf(obj);
+        byte[] arr = new byte[size];
+        IntPtr ptr = Marshal.AllocHGlobal(size);
+        Marshal.StructureToPtr(obj, ptr, true);
+        Marshal.Copy(ptr, arr, 0, size);
+        Marshal.FreeHGlobal(ptr);
+        return arr;
+    }
+
+    private static T ByteArrayToStruct<T>(byte[] arr) where T : struct
+    {
+        T obj = new T();
+        int size = Marshal.SizeOf(obj);
+        IntPtr ptr = Marshal.AllocHGlobal(size);
+        Marshal.Copy(arr, 0, ptr, size);
+        obj = (T)Marshal.PtrToStructure(ptr, obj.GetType());
+        Marshal.FreeHGlobal(ptr);
+        return obj;
+    }
+
+    private static void PrintPacket(byte[] packet)
+    {
+        logger.Info("Packet: ");
+        var sb = new StringBuilder();
+        for (int i = 0; i < packet.Length; i++)
+        {
+            sb.Append($"0x{packet[i]:X2} ");
+        }
+        logger.Info(sb.ToString());
+    }
+
+    private static void PrintConfig(MacropadConfigurationDTO config)
+    {
+        foreach (var layer in config.layers)
+        {
+            logger.Info($"Layer: {layer.name}, Enabled: {layer.isEnabled}");
+            foreach (var action in layer.actions)
+            {
+                logger.Info($"  Key: {action.key}, Modifier: {action.modifier}, Text: {action.text}");
+            }
+        }
     }
 }

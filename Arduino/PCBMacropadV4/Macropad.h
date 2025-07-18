@@ -32,5 +32,5 @@ private:
   bool invertOled = false;
   unsigned long invertOledTimestamp;
   const unsigned long invertOledDuration = 5 * 60 * 1000; // Should work out to 5 min :-)
-  // const unsigned long invertOledDuration = 1000; // Should work out to 5 min :-)
+  // const unsigned long invertOledDuration = 10 * 1000; // debug - invert every 10 sec
 };

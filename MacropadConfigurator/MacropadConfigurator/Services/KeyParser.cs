@@ -105,6 +105,34 @@ public static class KeyParser
         { Key.NumPad7, 0x5F }, { Key.NumPad8, 0x60 }, { Key.NumPad9, 0x61 }
     };
 
+    private static readonly Dictionary<byte, Key> _hidToKeyMap;
+
+    // --- Mapping for modifier bits to WPF Keys ---
+    private static readonly Dictionary<ushort, Key> _modifierHidToKeyMap = new()
+    {
+        { MOD_LEFT_CTRL_BIT, Key.LeftCtrl },
+        { MOD_LEFT_SHIFT_BIT, Key.LeftShift },
+        { MOD_LEFT_ALT_BIT, Key.LeftAlt },
+        { MOD_RIGHT_CTRL_BIT, Key.RightCtrl },
+        { MOD_RIGHT_SHIFT_BIT, Key.RightShift },
+        { MOD_RIGHT_ALT_BIT, Key.RightAlt },
+    };
+
+    /// <summary>
+    /// Static constructor to build the reverse lookup dictionaries.
+    /// This runs only once when the class is first accessed.
+    /// </summary>
+    static KeyParser()
+    {
+        // Populate the reverse HID-to-Key map from the forward map.
+        _hidToKeyMap = new Dictionary<byte, Key>(_keyToHidMap.Count);
+        foreach (var pair in _keyToHidMap)
+        {
+            // In case of duplicate HID codes, this will only keep the last one.
+            _hidToKeyMap[pair.Value] = pair.Key;
+        }
+    }
+
     /// <summary>
     /// Converts a string representation of a key to its System.Windows.Input.Key enum value.
     /// Supports common aliases.
@@ -150,5 +178,19 @@ public static class KeyParser
         }
         // Return 0 for unmapped keys, which is 'HID_KEY_NONE'
         return 0;
+    }
+
+    /// <summary>
+    /// Converts a USB HID Usage ID to its corresponding System.Windows.Input.Key.
+    /// </summary>
+    /// <param name="hidCode">The HID Usage ID byte from the Arduino.</param>
+    /// <returns>The corresponding WPF Key, or Key.None if not found.</returns>
+    public static Key HidToKey(byte hidCode)
+    {
+        if (_hidToKeyMap.TryGetValue(hidCode, out Key key))
+        {
+            return key;
+        }
+        return Key.None;
     }
 }

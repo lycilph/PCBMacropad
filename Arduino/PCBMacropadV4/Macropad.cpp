@@ -13,6 +13,7 @@ void Macropad::begin() {
 }
 
 void Macropad::updateDisplay() {
+  display->invertDisplay(invertOled);
   display->clear();
 
   display->setFont(Verdana12);
