@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MacropadConfigurator.Extensions;
 
@@ -18,7 +19,7 @@ public partial class MacropadLayer : ObservableObject
     {
         Buttons = Enumerable
             .Range(0, 9)
-            .Select(i => new MacropadButton { Text = $"B{i}", Key = $"{i}", Modifier="Alt" })
+            .Select(i => new MacropadButton { Text = $"{i}", Key = Key.None, Modifier = ModifierKeys.None })
             .ToObservableCollection();
     }
 }

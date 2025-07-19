@@ -38,7 +38,7 @@
             
             <!-- Converters -->
             <BooleanToVisibilityConverter x:Key="bool_to_visibilty_converter"/>
-            <c:ShortcutConverter x:Key="shortcut_converter"/>
+            <c:KeyConverter x:Key="key_converter"/>
 
             <!-- Datatemplates -->
             <DataTemplate DataType="{x:Type vm:MainViewModel}">

@@ -8,14 +8,17 @@
              mc:Ignorable="d" 
              d:DesignHeight="200" d:DesignWidth="200"
              d:DataContext="{d:DesignInstance Type=m:MacropadButton, IsDesignTimeCreatable=False}">
-    <Border Margin="5"
-            Padding="5"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center">
-        <StackPanel>
-            <TextBlock Text="{Binding Text}"/>
-            <TextBlock Text="{Binding Key}"/>
-            <TextBlock Text="{Binding Modifier}"/>
+    <StackPanel>
+        <TextBlock Text="Button" FontSize="24"/>
+
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Text="Text" Width="75" VerticalAlignment="Center"/>
+            <TextBox Text="{Binding Text}" MaxLength="5" Width="100"/>
         </StackPanel>
-    </Border>
+
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Text="Key" Width="75" VerticalAlignment="Center"/>
+            <TextBox Text="{Binding Key}" MaxLength="5" Width="100"/>
+        </StackPanel>
+    </StackPanel>
 </UserControl>

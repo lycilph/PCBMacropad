@@ -32,8 +32,8 @@ public partial class MacropadManager : ObservableObject
                 var button = layer.Buttons[j];
                 var buttonDto = layerDto.actions[j];
                 button.Text = buttonDto.text;
-                button.Key = KeyParser.HidToKey(buttonDto.key).ToString();
-                //button.Modifier = buttonDto.modifier;
+                button.Key = KeyParser.HidToKey(buttonDto.key);
+                button.Modifier = KeyParser.HidModifiersToKeys(buttonDto.modifier);
             }
         }
     }

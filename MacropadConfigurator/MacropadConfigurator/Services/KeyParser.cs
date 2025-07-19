@@ -4,6 +4,16 @@ namespace MacropadConfigurator.Services;
 
 public static class KeyParser
 {
+    // These must match the definitions in HID-Project.h
+    private const ushort MOD_LEFT_CTRL_BIT = (1 << 8);
+    private const ushort MOD_LEFT_SHIFT_BIT = (1 << 9);
+    private const ushort MOD_LEFT_ALT_BIT = (1 << 10);
+    //private const ushort MOD_LEFT_GUI_BIT = (1 << 11);
+    private const ushort MOD_RIGHT_CTRL_BIT = (1 << 12);
+    private const ushort MOD_RIGHT_SHIFT_BIT = (1 << 13);
+    private const ushort MOD_RIGHT_ALT_BIT = (1 << 14);
+    //private const ushort MOD_RIGHT_GUI_BIT = (1 << 15);
+
     // A dictionary to map common, user-friendly names to their official Key enum names.
     private static readonly Dictionary<string, string> _keyNameMappings = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -108,14 +118,14 @@ public static class KeyParser
     private static readonly Dictionary<byte, Key> _hidToKeyMap;
 
     // --- Mapping for modifier bits to WPF Keys ---
-    private static readonly Dictionary<ushort, Key> _modifierHidToKeyMap = new()
+    private static readonly Dictionary<ushort, ModifierKeys> _modifierHidToKeyMap = new()
     {
-        { MOD_LEFT_CTRL_BIT, Key.LeftCtrl },
-        { MOD_LEFT_SHIFT_BIT, Key.LeftShift },
-        { MOD_LEFT_ALT_BIT, Key.LeftAlt },
-        { MOD_RIGHT_CTRL_BIT, Key.RightCtrl },
-        { MOD_RIGHT_SHIFT_BIT, Key.RightShift },
-        { MOD_RIGHT_ALT_BIT, Key.RightAlt },
+        { MOD_LEFT_CTRL_BIT, ModifierKeys.Control },
+        { MOD_LEFT_SHIFT_BIT, ModifierKeys.Shift },
+        { MOD_LEFT_ALT_BIT, ModifierKeys.Alt },
+        { MOD_RIGHT_CTRL_BIT, ModifierKeys.Control },
+        { MOD_RIGHT_SHIFT_BIT, ModifierKeys.Shift },
+        { MOD_RIGHT_ALT_BIT, ModifierKeys.Alt },
     };
 
     /// <summary>
@@ -193,4 +203,35 @@ public static class KeyParser
         }
         return Key.None;
     }
+
+
+    public static ModifierKeys HidModifiersToKeys(ushort hidModifiers)
+    {
+        var mods = ModifierKeys.None;
+        foreach (var pair in _modifierHidToKeyMap)
+        {
+            if ((hidModifiers & pair.Key) != 0)
+            {
+                mods |= pair.Value;
+            }
+        }
+        return mods;
+    }
+
+    //public static ushort KeysToHidModifiers(IEnumerable<Key> modifierKeys)
+    //{
+    //    ushort hidModifiers = 0;
+    //    if (modifierKeys == null) return 0;
+
+    //    var keyToModifierMap = _modifierHidToKeyMap.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
+
+    //    foreach (var key in modifierKeys)
+    //    {
+    //        if (keyToModifierMap.TryGetValue(key, out ushort bit))
+    //        {
+    //            hidModifiers |= bit;
+    //        }
+    //    }
+    //    return hidModifiers;
+    //}
 }

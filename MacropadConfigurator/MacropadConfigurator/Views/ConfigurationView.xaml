@@ -18,14 +18,14 @@
     <Grid Margin="20 0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*"/>
-            <ColumnDefinition Width="3*"/>
-            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
 
         <TextBlock Grid.Row="0"
@@ -35,22 +35,30 @@
                    Margin="0 0 0 10"/>
 
         <Button Grid.Row="0"
-                Grid.Column="2"
+                Grid.Column="1"
                 Content="{icon:Lucide Kind=Pencil}"
                 Style="{DynamicResource MahApps.Styles.Button.Circle}"
                 HorizontalAlignment="Right"
                 Width="36"
                 Height="36"/>
 
-        <ListBox Grid.Row="1"
-                 Grid.Column="0"
-                 ItemsSource="{Binding Layers}"
-                 SelectedItem="{Binding SelectedLayer}"
-                 DisplayMemberPath="Name"/>
+        <StackPanel Grid.Row="1"
+                    Grid.Column="0"
+                    Orientation="Horizontal">
+            <TextBlock Text="Layers"
+                       VerticalAlignment="Center"/>
+            <ComboBox ItemsSource="{Binding Layers}"
+                      SelectedItem="{Binding SelectedLayer}"
+                      DisplayMemberPath="Name"
+                      Margin="10 0 0 0"/>
+            <CheckBox Content="Enabled"
+                      IsChecked="{Binding SelectedLayer.IsEnabled}"
+                      Margin="10 0 0 0"/>
+        </StackPanel>
 
-        <ListBox Grid.Row="1"
-                 Grid.Column="1"
-                 Margin="10 0"
+        <ListBox Grid.Row="2"
+                 Grid.Column="0"
+                 Margin="0 10 0 0"
                  ItemsSource="{Binding SelectedLayer.Buttons}"
                  SelectedItem="{Binding SelectedButton}">
             <ListBox.ItemsPanel>
@@ -58,14 +66,25 @@
                     <UniformGrid Rows="3" Columns="3"/>
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Border Margin="5 0">
+                        <StackPanel>
+                            <TextBlock Text="{Binding Text}" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding Key, Converter={StaticResource key_converter}}"/>
+                            <TextBlock Text="{Binding Modifier, Converter={StaticResource key_converter}}"/>
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
         </ListBox>
 
-        <TextBlock Grid.Row="1"
-                   Grid.Column="2"
-                   Text="Button setup"/>
+        <ContentControl Grid.Row="2"
+                        Grid.Column="1"
+                        Content="{Binding SelectedButton}"/>
 
-        <StackPanel Grid.Row="2"
-                    Grid.Column="2"
+        <StackPanel Grid.Row="3"
+                    Grid.Column="1"
                     Orientation="Horizontal"
                     HorizontalAlignment="Right">
             <Button Content="Save"

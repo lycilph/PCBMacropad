@@ -5,7 +5,7 @@ using System.Windows.Input;
 
 namespace MacropadConfigurator.Converters;
 
-public class ShortcutConverter : IValueConverter
+public class KeyConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {

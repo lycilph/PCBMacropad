@@ -57,8 +57,8 @@
                                     <ColumnDefinition Width="Auto" SharedSizeGroup="6"/>
                                 </Grid.ColumnDefinitions>
 
-                                <TextBlock Grid.Column="0" Margin="10 0" VerticalAlignment="Center" Text="{Binding Key, Converter={StaticResource shortcut_converter}}"/>
-                                <TextBlock Grid.Column="1" Margin="10 0" VerticalAlignment="Center" Text="{Binding Modifiers, Converter={StaticResource shortcut_converter}, StringFormat=[{0}]}"/>
+                                <TextBlock Grid.Column="0" Margin="10 0" VerticalAlignment="Center" Text="{Binding Key, Converter={StaticResource key_converter}}"/>
+                                <TextBlock Grid.Column="1" Margin="10 0" VerticalAlignment="Center" Text="{Binding Modifiers, Converter={StaticResource key_converter}, StringFormat=[{0}]}"/>
                                 <TextBlock Grid.Column="2" Margin="10 0" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding Name}"/>
 
                                 <Button Grid.Column="3"

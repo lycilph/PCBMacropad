@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System.Windows.Input;
 
 namespace MacropadConfigurator.Models;
 
@@ -8,8 +9,8 @@ public partial class MacropadButton : ObservableObject
     private string text = string.Empty;
 
     [ObservableProperty]
-    private string key = string.Empty;
+    private Key key = Key.None;
 
     [ObservableProperty]
-    private string modifier = string.Empty;
+    private ModifierKeys modifier = ModifierKeys.None;
 }
