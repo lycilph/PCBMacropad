@@ -5,10 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:tb="http://www.hardcodet.net/taskbar"
              xmlns:local="clr-namespace:MacropadConfigurator"
-             xmlns:m="clr-namespace:MacropadConfigurator.Models"
              xmlns:vm="clr-namespace:MacropadConfigurator.ViewModels"
              xmlns:v="clr-namespace:MacropadConfigurator.Views"
-             xmlns:c="clr-namespace:MacropadConfigurator.Converters"
              mc:Ignorable="d"
              Startup="ApplicationStartup"
              Exit="ApplicationExit">
@@ -37,32 +35,10 @@
             </tb:TaskbarIcon>
             
             <!-- Converters -->
-            <BooleanToVisibilityConverter x:Key="bool_to_visibilty_converter"/>
-            <c:KeyConverter x:Key="key_converter"/>
-
+           
             <!-- Datatemplates -->
             <DataTemplate DataType="{x:Type vm:MainViewModel}">
                 <v:MainView/>
-            </DataTemplate>
-
-            <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
-                <v:SettingsView/>
-            </DataTemplate>
-
-            <DataTemplate DataType="{x:Type vm:ShortcutsViewModel}">
-                <v:ShortcutsView/>
-            </DataTemplate>
-
-            <DataTemplate DataType="{x:Type vm:ConfigurationViewModel}">
-                <v:ConfigurationView/>
-            </DataTemplate>
-
-            <DataTemplate DataType="{x:Type vm:EditShortcutViewModel}">
-                <v:EditShortcutView/>
-            </DataTemplate>
-
-            <DataTemplate DataType="{x:Type m:MacropadButton}">
-                <v:MacropadButtonView/>
             </DataTemplate>
         </ResourceDictionary>
     </Application.Resources>

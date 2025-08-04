@@ -1,8 +1,8 @@
 #pragma once
 
-#define ENABLE_SERIAL
+//#define ENABLE_SERIAL
 
-#define ENABLE_FREERAM_CHECK
+//#define ENABLE_FREERAM_CHECK
 
 #ifdef ENABLE_FREERAM_CHECK
   inline int freeMemory() {
@@ -14,7 +14,7 @@
 
 // --- Debug Configuration ---
 // Comment out this line for the final build to save ~1.5KB of flash memory
-#define ENABLE_DEBUG
+//#define ENABLE_DEBUG
 
 #ifdef ENABLE_DEBUG
   #define DEBUG_PRINT(...) Serial.print(__VA_ARGS__)

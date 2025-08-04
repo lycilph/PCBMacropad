@@ -45,7 +45,7 @@ void Macropad::update() {
     {
       if (keypad->key[i].stateChanged && keypad->key[i].kstate == PRESSED)
       {
-        DEBUG_PRINTLN(keypad->key[i].kchar);
+        // DEBUG_PRINTLN(keypad->key[i].kchar);
         executeAction(keypad->key[i].kchar - 49);
       }
     }
@@ -55,8 +55,8 @@ void Macropad::update() {
   {
     if (keypad->key[i].kstate == HOLD && (millis() - keyHeldTime[i]) > 100)
     {
-      DEBUG_PRINT(keypad->key[i].kchar);
-      DEBUG_PRINTLN(F(" - held"));
+      // DEBUG_PRINT(keypad->key[i].kchar);
+      // DEBUG_PRINTLN(F(" - held"));
       executeAction(keypad->key[i].kchar - 49);
 
       keyHeldTime[i] = millis();

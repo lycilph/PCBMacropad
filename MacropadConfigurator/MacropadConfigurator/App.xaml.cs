@@ -1,11 +1,10 @@
-﻿using System.Windows;
-using Hardcodet.Wpf.TaskbarNotification;
-using MacropadConfigurator.Services;
+﻿using Hardcodet.Wpf.TaskbarNotification;
 using MacropadConfigurator.ViewModels;
 using MacropadConfigurator.Views;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.DependencyInjection;
 using NLog;
+using System.Windows;
 
 namespace MacropadConfigurator;
 
@@ -16,7 +15,7 @@ public partial class App : Application
     public IServiceProvider Services { get; }
 
     private TaskbarIcon notifyIcon = null!;
-    private ShellWindow mainWindow = null!;
+    private ShellWindow window = null!;
 
     public App()
     {
@@ -35,20 +34,11 @@ public partial class App : Application
         services.AddSingleton(DialogCoordinator.Instance);
 
         // Register singletons
-        services.AddSingleton<ApplicationManager>();
-        services.AddSingleton<ShortcutManager>();
-        services.AddSingleton<MacropadManager>();
-        services.AddSingleton<CommunicationManager>();
-        services.AddSingleton<SettingsService>();
-        services.AddSingleton<CompilerService>();
+
 
         // Register view models
         services.AddTransient<ShellViewModel>();
         services.AddTransient<MainViewModel>();
-        services.AddTransient<SettingsViewModel>();
-        services.AddTransient<ConfigurationViewModel>();
-        services.AddTransient<ShortcutsViewModel>();
-        services.AddTransient<EditShortcutViewModel>();
 
         return services.BuildServiceProvider();
     }
@@ -58,9 +48,7 @@ public partial class App : Application
         logger.Info("Application starting...");
 
         // Initialize application
-        var applicationManager = Services.GetRequiredService<ApplicationManager>();
-        applicationManager.Load();
-        applicationManager.InitializeAsync();
+
 
         // Initialize the NotifyIcon
         notifyIcon = (TaskbarIcon)FindResource("NotifyIcon");
@@ -68,7 +56,7 @@ public partial class App : Application
 
         // Initialize main window
         var vm = Services.GetRequiredService<ShellViewModel>();
-        mainWindow = new ShellWindow { DataContext = vm };
+        window = new ShellWindow { DataContext = vm };
 
         ShowWindow();
     }
@@ -77,21 +65,20 @@ public partial class App : Application
     {
         logger.Info("Application exiting...");
 
-        var applicationManager = Services.GetRequiredService<ApplicationManager>();
-        applicationManager.Save();
-        applicationManager.Cleanup();
 
+#pragma warning disable CA1416 // Validate platform compatibility
         notifyIcon.Dispose();
+#pragma warning restore CA1416 // Validate platform compatibility
     }
 
     public void ShowWindow()
     {
-        mainWindow.Show();
-        mainWindow.Activate();
+        window.Show();
+        window.Activate();
     }
 
     public void HideWindow()
     {
-        mainWindow.Hide();
+        window.Hide();
     }
 }

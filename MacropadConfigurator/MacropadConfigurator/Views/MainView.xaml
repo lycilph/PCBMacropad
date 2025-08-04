@@ -3,42 +3,69 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:MacropadConfigurator"
-             xmlns:behavior="clr-namespace:MacropadConfigurator.Behaviors"
-             xmlns:vm="clr-namespace:MacropadConfigurator.ViewModels"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800"
-             d:DataContext="{d:DesignInstance Type=vm:MainViewModel, IsDesignTimeCreatable=False}">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition Height="150"/>
-        </Grid.RowDefinitions>
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:local="clr-namespace:MacropadConfigurator.Views"
+             mc:Ignorable="d" >
+    <StackPanel>
+        <TextBlock Text="Layer: Shortcuts" />
+        <ItemsControl>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Rows="3" Columns="3" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
 
-        <TabControl Grid.Row="0"
-                TabStripPlacement="Left">
-            <TabItem Header="Shortcuts"
-                 Content="{Binding ShortcutsViewModel}"/>
-
-            <TabItem Header="Configuration"
-                 Content="{Binding ConfigurationViewModel}"/>
-        </TabControl>
-
-        <Rectangle Grid.Row="0"
-                   Fill="Gray"
-                   Opacity="0.65"
-                   Visibility="{Binding ShowOverlay, Converter={StaticResource bool_to_visibilty_converter}}"/>
-
-        <Border Grid.Row="1"
-                    BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
+            <Border CornerRadius="5"
                     BorderThickness="1"
-                    Margin="2"
-                    Padding="2"
-                    CornerRadius="2">
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <ItemsControl behavior:ScrollViewerBehavior.AutoScroll="True"
-                              ItemsSource="{Binding Log}"/>
-            </ScrollViewer>
-        </Border>
-    </Grid>
+                    BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
+                    Background="White"
+                    Margin="10"
+                    Padding="5">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="2"
+                                      ShadowDepth="5"
+                                      Direction="-45"
+                                      Color="Black"
+                                      Opacity="0.4" />
+                </Border.Effect>
+                <StackPanel>
+                    <TextBlock Text="Shortcut 1" FontWeight="Bold"/>
+                    <TextBlock Text="Key: F13" />
+                    <TextBlock Text="Mods: None" />
+                </StackPanel>
+            </Border>
+
+            <Border CornerRadius="5"
+                    BorderThickness="1"
+                    BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
+                    Margin="10"
+                    Padding="5">
+                <StackPanel>
+                    <TextBlock Text="Shortcut 2" FontWeight="Bold"/>
+                    <TextBlock Text="Key: F14" />
+                    <TextBlock Text="Mods: None" />
+                </StackPanel>
+            </Border>
+            <Border CornerRadius="5"
+                    BorderThickness="1"
+                    BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
+                    Margin="10"
+                    Padding="5">
+                <StackPanel>
+                    <TextBlock Text="Shortcut 3" FontWeight="Bold"/>
+                    <TextBlock Text="Key: F15" />
+                    <TextBlock Text="Mods: None" />
+                </StackPanel>
+            </Border>
+
+
+            <TextBlock Text="Shortcut 4" />
+            <TextBlock Text="Shortcut 5" />
+            <TextBlock Text="Shortcut 6" />
+
+            <TextBlock Text="Shortcut 7" />
+            <TextBlock Text="Shortcut 8" />
+            <TextBlock Text="Shortcut 9" />
+        </ItemsControl>
+    </StackPanel>
 </UserControl>

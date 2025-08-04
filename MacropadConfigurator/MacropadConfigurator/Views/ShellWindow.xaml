@@ -1,62 +1,35 @@
 ﻿<mah:MetroWindow x:Class="MacropadConfigurator.Views.ShellWindow"
                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                 xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                  xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
-                 xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+                 xmlns:dia="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
                  xmlns:icon="http://metro.mahapps.com/winfx/xaml/iconpacks"
-                 xmlns:local="clr-namespace:MacropadConfigurator"
-                 xmlns:behavior="clr-namespace:MacropadConfigurator.Behaviors"
+                 xmlns:local="clr-namespace:MacropadConfigurator.Views"
                  xmlns:vm="clr-namespace:MacropadConfigurator.ViewModels" 
                  mc:Ignorable="d"
                  d:DataContext="{d:DesignInstance Type=vm:ShellViewModel, IsDesignTimeCreatable=False}"
                  Title="Macropad Configurator" 
                  Height="600" 
-                 Width="800"
+                 Width="600"
                  WindowStartupLocation="CenterScreen"
                  ResizeMode="CanMinimize"
-                 Dialog:DialogParticipation.Register="{Binding}">
-    <i:Interaction.Behaviors>
-        <behavior:LifecycleBehavior/>
-    </i:Interaction.Behaviors>
-
-    <Window.InputBindings>
-        <KeyBinding Key="F1" Command="{Binding ToggleSettingsCommand}"/>
-    </Window.InputBindings>
-
+                 dia:DialogParticipation.Register="{Binding}">
     <mah:MetroWindow.RightWindowCommands>
-        <mah:WindowCommands ShowSeparators="False">
+        <mah:WindowCommands ShowSeparators="false">
+            <Button Content="{icon:Lucide Kind=ArrowBigUp}"
+                    ToolTip="Upload configuration to Macropad"/>
+            <Button Content="{icon:Lucide Kind=ArrowBigDown}"
+                    ToolTip="Download configuration from Macropad"/>
+            <Button Content="{icon:Lucide Kind=RotateCcw}"
+                    ToolTip="Reset configuration on Macropad"/>
+            <Separator/>
             <Button Content="{icon:Lucide Kind=Settings}"
                     Command="{Binding ToggleSettingsCommand}"
                     ToolTip="Settings (F1)"/>
         </mah:WindowCommands>
     </mah:MetroWindow.RightWindowCommands>
     
-    <mah:MetroWindow.Flyouts>
-        <mah:FlyoutsControl>
-            <mah:Flyout Header="Settings" 
-                        Theme="Adapt"
-                        Position="Right" 
-                        Width="250"
-                        IsOpen="{Binding SettingsViewModel.IsOpen}"
-                        CloseCommand="{Binding ToggleSettingsCommand}">
-                <ContentControl Content="{Binding SettingsViewModel}"/>
-            </mah:Flyout>
-        </mah:FlyoutsControl>
-    </mah:MetroWindow.Flyouts>
-    
-    <Grid>
-        <ContentControl Content="{Binding Content}"/>
-
-        <Rectangle Fill="Gray"
-                   Opacity="0.65"
-                   Visibility="{Binding SettingsViewModel.IsOpen, Converter={StaticResource bool_to_visibilty_converter}}">
-            <Rectangle.InputBindings>
-                <MouseBinding MouseAction="LeftClick"
-                              Command="{Binding ToggleSettingsCommand}"/>
-            </Rectangle.InputBindings>
-        </Rectangle>
-    </Grid>
+    <ContentControl Content="{Binding Content}"/>
 </mah:MetroWindow>
