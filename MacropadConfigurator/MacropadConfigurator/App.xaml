@@ -35,10 +35,15 @@
             </tb:TaskbarIcon>
             
             <!-- Converters -->
-           
+            <BooleanToVisibilityConverter x:Key="bool_to_visibilty_converter"/>
+            
             <!-- Datatemplates -->
             <DataTemplate DataType="{x:Type vm:MainViewModel}">
                 <v:MainView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+                <v:SettingsView/>
             </DataTemplate>
         </ResourceDictionary>
     </Application.Resources>

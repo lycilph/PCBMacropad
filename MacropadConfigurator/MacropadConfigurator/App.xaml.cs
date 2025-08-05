@@ -1,4 +1,5 @@
 ﻿using Hardcodet.Wpf.TaskbarNotification;
+using MacropadConfigurator.Services;
 using MacropadConfigurator.ViewModels;
 using MacropadConfigurator.Views;
 using MahApps.Metro.Controls.Dialogs;
@@ -34,11 +35,14 @@ public partial class App : Application
         services.AddSingleton(DialogCoordinator.Instance);
 
         // Register singletons
-
+        services.AddSingleton<ApplicationService>();
+        services.AddSingleton<OverlayService>();
+        services.AddSingleton<SettingsService>();
 
         // Register view models
         services.AddTransient<ShellViewModel>();
         services.AddTransient<MainViewModel>();
+        services.AddTransient<SettingsViewModel>();
 
         return services.BuildServiceProvider();
     }
@@ -48,7 +52,8 @@ public partial class App : Application
         logger.Info("Application starting...");
 
         // Initialize application
-
+        var applicationManager = Services.GetRequiredService<ApplicationService>();
+        applicationManager.Load();
 
         // Initialize the NotifyIcon
         notifyIcon = (TaskbarIcon)FindResource("NotifyIcon");
@@ -65,6 +70,8 @@ public partial class App : Application
     {
         logger.Info("Application exiting...");
 
+        var applicationManager = Services.GetRequiredService<ApplicationService>();
+        applicationManager.Save();
 
 #pragma warning disable CA1416 // Validate platform compatibility
         notifyIcon.Dispose();

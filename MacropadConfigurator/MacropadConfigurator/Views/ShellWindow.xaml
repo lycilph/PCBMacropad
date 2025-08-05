@@ -30,6 +30,30 @@
                     ToolTip="Settings (F1)"/>
         </mah:WindowCommands>
     </mah:MetroWindow.RightWindowCommands>
-    
-    <ContentControl Content="{Binding Content}"/>
+
+    <mah:MetroWindow.Flyouts>
+        <mah:FlyoutsControl>
+            <mah:Flyout Header="Settings" 
+                        Theme="Adapt"
+                        Position="Right" 
+                        Width="250"
+                        IsOpen="{Binding SettingsViewModel.IsOpen}"
+                        CloseCommand="{Binding ToggleSettingsCommand}">
+                <ContentControl Content="{Binding SettingsViewModel}"/>
+            </mah:Flyout>
+        </mah:FlyoutsControl>
+    </mah:MetroWindow.Flyouts>
+
+    <Grid>
+        <ContentControl Content="{Binding Content}"/>
+
+        <Rectangle Fill="Gray"
+                   Opacity="0.65"
+                   Visibility="{Binding IsOverlayVisible, Converter={StaticResource bool_to_visibilty_converter}}">
+            <Rectangle.InputBindings>
+                <MouseBinding MouseAction="LeftClick"
+                  Command="{Binding ToggleSettingsCommand}"/>
+            </Rectangle.InputBindings>
+        </Rectangle>
+    </Grid>
 </mah:MetroWindow>
