@@ -21,7 +21,11 @@
     <i:Interaction.Behaviors>
         <behavior:WindowLifecycleBehavior/>
     </i:Interaction.Behaviors>
-    
+
+    <Window.InputBindings>
+        <KeyBinding Key="F1" Command="{Binding ToggleSettingsCommand}"/>
+    </Window.InputBindings>
+
     <mah:MetroWindow.RightWindowCommands>
         <mah:WindowCommands ShowSeparators="false">
             <Button Content="{icon:Lucide Kind=ArrowBigUp}"
@@ -30,7 +34,6 @@
                     ToolTip="Download configuration from Macropad"/>
             <Button Content="{icon:Lucide Kind=RotateCcw}"
                     ToolTip="Reset configuration on Macropad"/>
-            <Separator/>
             <Button Content="{icon:Lucide Kind=Settings}"
                     Command="{Binding ToggleSettingsCommand}"
                     ToolTip="Settings (F1)"/>
@@ -51,7 +54,8 @@
     </mah:MetroWindow.Flyouts>
 
     <Grid>
-        <ContentControl Content="{Binding Content}"/>
+        <mah:TransitioningContentControl Content="{Binding Content}"
+                                         Transition="LeftReplace"/>
 
         <Rectangle Fill="Gray"
                    Opacity="0.65"

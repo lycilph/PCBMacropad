@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:cex="urn:controlzex"
              xmlns:local="clr-namespace:MacropadConfigurator.Views"
              xmlns:vm="clr-namespace:MacropadConfigurator.ViewModels" 
              mc:Ignorable="d" 
@@ -24,7 +25,7 @@
                 <ComboBox ItemsSource="{Binding ApplicationColors}"
                           SelectedItem="{Binding SelectedApplicationColor}">
                     <ComboBox.ItemTemplate>
-                        <DataTemplate>
+                        <DataTemplate DataType="{x:Type cex:Theme}">
                             <StackPanel Orientation="Horizontal">
                                 <Border Width="{Binding RelativeSource={RelativeSource Mode=Self}, Path=ActualHeight, Mode=OneWay}"
                                         Background="{DynamicResource MahApps.Brushes.Tile.Small}"
