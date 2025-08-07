@@ -42,9 +42,10 @@
                       FontSize="20"/>
             
             <mah:ToggleSwitch Grid.Column="2"
-                              Content="Enabled"
                               Margin="10 0 0 0"
-                              IsEnabled="{Binding SelectedLayer.IsEnabled}"/>
+                              OnContent="Enabled"
+                              OffContent="Disabled"
+                              IsOn="{Binding SelectedLayer.IsEnabled}"/>
             
             <Button Grid.Column="3"
                     Content="{icon:Lucide Kind=Pencil}"
