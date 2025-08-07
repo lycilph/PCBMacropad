@@ -8,6 +8,7 @@
              xmlns:vm="clr-namespace:MacropadConfigurator.ViewModels"
              xmlns:v="clr-namespace:MacropadConfigurator.Views"
              xmlns:m="clr-namespace:MacropadConfigurator.Models"
+             xmlns:c="clr-namespace:MacropadConfigurator.Converters"
              mc:Ignorable="d"
              Startup="ApplicationStartup"
              Exit="ApplicationExit">
@@ -35,9 +36,18 @@
                 </tb:TaskbarIcon.ContextMenu>
             </tb:TaskbarIcon>
             
+            <!-- Effects -->
+            <DropShadowEffect x:Key="DropShadow"
+                              BlurRadius="0"
+                              ShadowDepth="5"
+                              Direction="-45"
+                              Color="{DynamicResource MahApps.Colors.ThemeForeground}"
+                              Opacity="0.4" />
+            
             <!-- Converters -->
             <BooleanToVisibilityConverter x:Key="bool_to_visibilty_converter"/>
-            
+            <c:KeyConverter x:Key="key_converter"/>
+
             <!-- Datatemplates -->
             <DataTemplate DataType="{x:Type vm:MainViewModel}">
                 <v:MainView/>

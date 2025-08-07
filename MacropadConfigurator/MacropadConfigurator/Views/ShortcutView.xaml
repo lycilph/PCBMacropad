@@ -9,15 +9,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance Type=m:Shortcut, IsDesignTimeCreatable=False}">
-    <UserControl.Resources>
-        <DropShadowEffect x:Key="DropShadow"
-                          BlurRadius="0"
-                          ShadowDepth="5"
-                          Direction="-45"
-                          Color="{DynamicResource MahApps.Colors.ThemeForeground}"
-                          Opacity="0.4" />
-    </UserControl.Resources>
-    
     <Grid Margin="10">
         <!-- Shadow Layer -->
         <Border CornerRadius="5"
@@ -34,8 +25,11 @@
                 <TextBlock Text="{Binding Text}" 
                            FontWeight="Bold"
                            Margin="0 0 0 5"/>
-                <TextBlock Text="Key: F13" />
-                <TextBlock Text="Mods: None" />
+                
+                <TextBlock Text="{Binding Key, StringFormat=Key: {0}, Converter={StaticResource key_converter}}"/>
+
+                <TextBlock Text="{Binding Modifiers, StringFormat=Mods: {0}, Converter={StaticResource key_converter}}"/>
+
                 <CheckBox Content="Script"
                           IsHitTestVisible="False"
                           Focusable="False"/>
@@ -47,7 +41,7 @@
                             Style="{DynamicResource MahApps.Styles.Button.Circle}"/>
                     <Button Content="{icon:Lucide Kind=Play, Width=12, Height=12}"
                             Padding="6 6"
-                            Margin="5 0 0 0"
+                            Margin="20 0 0 0"
                             Style="{DynamicResource MahApps.Styles.Button.Circle}"/>
                 </StackPanel>
             </StackPanel>

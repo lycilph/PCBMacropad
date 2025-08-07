@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using MacropadConfigurator.Messages;
 using MacropadConfigurator.Models;
@@ -11,6 +12,7 @@ namespace MacropadConfigurator.ViewModels;
 public partial class MainViewModel : ObservableRecipient, IRecipient<LogMessage>
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+
 
     public List<Layer> Layers { get; set; }
 
@@ -33,5 +35,11 @@ public partial class MainViewModel : ObservableRecipient, IRecipient<LogMessage>
         logger.Info($"Got message: {message.Text}");
 
         Log.Add(message.Text);
+    }
+
+    [RelayCommand]
+    private void EditLayerName()
+    {
+        WeakReferenceMessenger.Default.Send(new EditLayerMessage(SelectedLayer));
     }
 }

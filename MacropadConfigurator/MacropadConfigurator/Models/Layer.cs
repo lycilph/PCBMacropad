@@ -24,5 +24,15 @@ public partial class Layer : ObservableObject
             .Range(1, 9)
             .Select(i => new Shortcut { Text = $"Button{i}", Key = KeyParser.StringToKey("a"), Modifiers = ModifierKeys.None })
             .ToObservableCollection();
+
+        Shortcuts[1].Key = Key.B;
+        Shortcuts[2].Key = Key.C;
+        Shortcuts[3].Key = Key.D;
+        Shortcuts[4].Key = Key.F13;
+
+        Shortcuts[1].Modifiers = ModifierKeys.Shift;
+        Shortcuts[2].Modifiers = ModifierKeys.Alt;
+        Shortcuts[3].Modifiers = ModifierKeys.Control;
+        Shortcuts[4].Modifiers = ModifierKeys.Shift | ModifierKeys.Alt | ModifierKeys.Control;
     }
 }

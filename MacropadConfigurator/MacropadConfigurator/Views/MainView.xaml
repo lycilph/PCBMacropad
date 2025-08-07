@@ -15,26 +15,44 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0"
-                    Orientation="Horizontal"
-                    Margin="10 10 10 0">
-            <TextBlock Text="Layer:" 
+        <Grid Grid.Row="0"
+              Margin="10 10 10 0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            
+            <TextBlock Grid.Column="0"
+                       Text="Layer:" 
                        FontSize="24"
                        VerticalAlignment="Center"/>
-            <ComboBox ItemsSource="{Binding Layers}"
+            
+            <ComboBox Grid.Column="1"
+                      ItemsSource="{Binding Layers}"
                       SelectedItem="{Binding SelectedLayer}"
                       DisplayMemberPath="Name"
+                      Width="200"
                       Margin="10 0 0 0"
                       FontSize="20"/>
-            <mah:ToggleSwitch Content="Enabled"
-                              Margin="10 0 0 0"/>
-            <Button Content="{icon:Lucide Kind=Pencil}"
+            
+            <mah:ToggleSwitch Grid.Column="2"
+                              Content="Enabled"
+                              Margin="10 0 0 0"
+                              IsEnabled="{Binding SelectedLayer.IsEnabled}"/>
+            
+            <Button Grid.Column="3"
+                    Content="{icon:Lucide Kind=Pencil}"
                     HorizontalAlignment="Right"
-                    Style="{DynamicResource MahApps.Styles.Button.Circle}"/>
-        </StackPanel>
+                    MinWidth="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"
+                    Style="{DynamicResource MahApps.Styles.Button.Circle}"
+                    Command="{Binding EditLayerNameCommand}"/>
+        </Grid>
 
         <ItemsControl Grid.Row="1"
                       ItemsSource="{Binding SelectedLayer.Shortcuts}">
@@ -45,7 +63,10 @@
             </ItemsControl.ItemsPanel>
         </ItemsControl>
 
-        <Border Grid.Row="2"
+        <TextBlock Grid.Row="2"
+                   Text="Log"
+                   Margin="2"/>
+        <Border Grid.Row="3"
                 BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
                 BorderThickness="1"
                 Margin="2"
@@ -53,7 +74,7 @@
                 CornerRadius="2">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <ItemsControl behaviors:ScrollViewerBehavior.AutoScroll="True"
-                              ItemsSource="{Binding Log}"/>
+                            ItemsSource="{Binding Log}"/>
             </ScrollViewer>
         </Border>
     </Grid>
