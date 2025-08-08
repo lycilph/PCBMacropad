@@ -22,9 +22,15 @@ public class WindowLifecycleBehavior : Behavior<Window>
     private void AssociatedObjectDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
         if (AssociatedObject.DataContext is IWindowLifecycleAware vm)
+        {
             AssociatedObject.Closing += AssociatedObjectClosing;
+            AssociatedObject.Loaded += AssociatedObjectLoaded;
+        }
         else
+        {
             AssociatedObject.Closing -= AssociatedObjectClosing;
+            AssociatedObject.Loaded -= AssociatedObjectLoaded;
+        }
     }
 
     private void AssociatedObjectClosing(object? sender, CancelEventArgs e)
@@ -32,6 +38,14 @@ public class WindowLifecycleBehavior : Behavior<Window>
         if (AssociatedObject.DataContext is IWindowLifecycleAware vm)
         {
             vm.OnClosing(e);
+        }
+    }
+
+    private void AssociatedObjectLoaded(object? sender, RoutedEventArgs e)
+    {
+        if (AssociatedObject.DataContext is IWindowLifecycleAware vm)
+        {
+            vm.OnLoaded();
         }
     }
 }

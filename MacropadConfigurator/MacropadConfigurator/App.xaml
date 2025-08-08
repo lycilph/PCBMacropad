@@ -47,6 +47,7 @@
             <!-- Converters -->
             <BooleanToVisibilityConverter x:Key="bool_to_visibilty_converter"/>
             <c:KeyConverter x:Key="key_converter"/>
+            <c:StringToBoolConverter x:Key="string_to_bool_converter"/>
 
             <!-- Datatemplates -->
             <DataTemplate DataType="{x:Type vm:MainViewModel}">

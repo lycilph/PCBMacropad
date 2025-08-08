@@ -13,6 +13,7 @@ public partial class MainViewModel : ObservableRecipient, IRecipient<LogMessage>
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
+    private readonly ScriptService scriptService;
 
     public List<Layer> Layers { get; set; }
 
@@ -22,8 +23,10 @@ public partial class MainViewModel : ObservableRecipient, IRecipient<LogMessage>
     [ObservableProperty]
     private ObservableCollection<string> log = [];
 
-    public MainViewModel(ApplicationService applicationService)
+    public MainViewModel(ApplicationService applicationService, ScriptService scriptService)
     {
+        this.scriptService = scriptService;
+
         Layers = applicationService.Layers;
         selectedLayer = Layers.First();
 
@@ -46,5 +49,12 @@ public partial class MainViewModel : ObservableRecipient, IRecipient<LogMessage>
     private void EditShortcut(Shortcut shortcut)
     {
         WeakReferenceMessenger.Default.Send(new EditShortcutMessage(shortcut));
+    }
+
+    [RelayCommand]
+    private void ExecuteShortcut(Shortcut shortcut)
+    {
+        WeakReferenceMessenger.Default.Send(new LogMessage($"Executing script for shortcut [{shortcut.Text}]"));
+        scriptService.ExecuteScriptAsync(shortcut.CompiledScript);
     }
 }

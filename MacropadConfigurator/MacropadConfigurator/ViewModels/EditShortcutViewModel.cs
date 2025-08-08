@@ -11,6 +11,8 @@ namespace MacropadConfigurator.ViewModels;
 
 public partial class EditShortcutViewModel : ObservableObject
 {
+    private readonly ScriptService scriptService;
+
     private Shortcut? shortcut;
 
     [ObservableProperty]
@@ -34,6 +36,11 @@ public partial class EditShortcutViewModel : ObservableObject
     [ObservableProperty]
     private string output = string.Empty;
 
+    public EditShortcutViewModel(ScriptService scriptService)
+    {
+        this.scriptService = scriptService;
+    }
+
     public void Set(Shortcut shortcut)
     {
         this.shortcut = shortcut;
@@ -43,16 +50,14 @@ public partial class EditShortcutViewModel : ObservableObject
         Control = shortcut.Modifiers.HasFlag(ModifierKeys.Control);
         Shift = shortcut.Modifiers.HasFlag(ModifierKeys.Shift);
         Alt = shortcut.Modifiers.HasFlag(ModifierKeys.Alt);
-        Document = new TextDocument();
+        Document = new TextDocument(shortcut.Script);
     }
 
     [RelayCommand]
     private async Task CompileAsync()
     {
-        await Task.CompletedTask;
-
-        //(var result, var msg, _) = await compilerService.CompileScriptAsync(Document.Text);
-        //Output = result ? "Success" : msg;
+        var result = await scriptService.CompileAsync(Document.Text);
+        Output = result.Success ? "Success" : result.Message;
     }
 
     [RelayCommand]
@@ -60,40 +65,35 @@ public partial class EditShortcutViewModel : ObservableObject
     {
         if (shortcut == null) return;
         
-        await Task.CompletedTask;
-        shortcut.Text = Text;
-        shortcut.Key = KeyParser.StringToKey(Key);
-        shortcut.Modifiers = (Control ? ModifierKeys.Control : ModifierKeys.None) |
-                             (Shift ? ModifierKeys.Shift : ModifierKeys.None) |
-                             (Alt ? ModifierKeys.Alt : ModifierKeys.None);
+        var parsed_key = KeyParser.StringToKey(Key);
+        var result = await scriptService.CompileAsync(Document.Text);
 
         if (Key != System.Windows.Input.Key.None.ToString() && shortcut.Key == System.Windows.Input.Key.None)
         {
+            // Error in parsing key
             Output = $"Couldn't parse the key [{Key}]";
+        }
+        else if (!string.IsNullOrWhiteSpace(Document.Text) && !result.Success)
+        {
+            // Error in parsing script
+            Output = result.Message;
         }
         else
         {
+            shortcut.Text = Text;
+            shortcut.Key = KeyParser.StringToKey(Key);
+            shortcut.Modifiers = (Control ? ModifierKeys.Control : ModifierKeys.None) |
+                                 (Shift ? ModifierKeys.Shift : ModifierKeys.None) |
+                                 (Alt ? ModifierKeys.Alt : ModifierKeys.None);
+
+            shortcut.Script = Document.Text;
+            shortcut.CompiledScript = result.Script;
+
             shortcut = null;
             Output = string.Empty;
 
             WeakReferenceMessenger.Default.Send(new NavigateToMainMessage());
         }
-
-        //(var result, var msg, var compiled_script) = await compilerService.CompileScriptAsync(Document.Text);
-        //if (result && compiled_script != null)
-        //{
-        //    Shortcut.Name = Name;
-        //    Shortcut.Text = Text;
-        //    Shortcut.Key = KeyParser.StringToKey(Key);
-        //    Shortcut.Modifiers = ConvertToModifierKeys();
-        //    Shortcut.Script = Document.Text;
-        //    Shortcut.CompiledScript = compiled_script;
-        //    WeakReferenceMessenger.Default.Send(new BackMessage());
-        //}
-        //else
-        //{
-        //    Output = msg;
-        //}
     }
 
     [RelayCommand]

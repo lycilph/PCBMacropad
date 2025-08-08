@@ -97,6 +97,12 @@ public partial class ShellViewModel
         });
     }
 
+    public void OnLoaded()
+    {
+        logger.Info("Shell is now loaded");
+        WeakReferenceMessenger.Default.Send(new LogMessage("Application is ready"));
+    }
+
     public void OnClosing(CancelEventArgs e)
     {
         if (settingsService.HideOnClose)
