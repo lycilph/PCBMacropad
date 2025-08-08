@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -21,6 +22,7 @@ public partial class ShellViewModel
     private readonly MainViewModel mainViewModel;
     private readonly EditShortcutViewModel editShortcutViewModel;
 
+    private readonly ApplicationService applicationService;
     private readonly SettingsService settingsService;
     private readonly OverlayService overlayService;
     private readonly CommunicationService communicationService;
@@ -39,6 +41,7 @@ public partial class ShellViewModel
     public ShellViewModel(MainViewModel mainViewModel,
                           EditShortcutViewModel editShortcutViewModel,
                           SettingsViewModel settingsViewModel,
+                          ApplicationService applicationService,
                           SettingsService settingsService,
                           OverlayService overlayService,
                           CommunicationService communicationService,
@@ -47,6 +50,7 @@ public partial class ShellViewModel
         this.mainViewModel = mainViewModel;
         this.editShortcutViewModel = editShortcutViewModel;
 
+        this.applicationService = applicationService;
         this.settingsService = settingsService;
         this.overlayService = overlayService;
         this.communicationService = communicationService;
@@ -101,6 +105,10 @@ public partial class ShellViewModel
     {
         logger.Info("Shell is now loaded");
         WeakReferenceMessenger.Default.Send(new LogMessage("Application is ready"));
+
+        overlayService.ShowSpinner();
+        applicationService.InitializeScripts();
+        overlayService.HideSpinner();
     }
 
     public void OnClosing(CancelEventArgs e)

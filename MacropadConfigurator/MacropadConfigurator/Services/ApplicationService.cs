@@ -14,17 +14,20 @@ public class ApplicationService
     private readonly string shortcutsFile = "shortcuts.json";
 
     private readonly SettingsService settingsService;
+    private readonly ScriptService scriptService;
 
     private readonly KeyboardHook keyboardHook;
 
     public List<Layer> Layers { get; private set; } = [];
 
-    public ApplicationService(SettingsService settingsService)
+    public ApplicationService(SettingsService settingsService, ScriptService scriptService)
     {
         this.settingsService = settingsService;
+        this.scriptService = scriptService;
+
         keyboardHook = new KeyboardHook();
     }
-    
+
     public string GetPath(string filename)
     {
         string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
@@ -34,6 +37,21 @@ public class ApplicationService
         Directory.CreateDirectory(appFolderPath);
 
         return Path.Combine(appFolderPath, filename);
+    }
+
+    public void InitializeScripts()
+    {
+        logger.Info("Compiling scripts");
+
+        Layers
+           .SelectMany(l => l.Shortcuts)
+           .Where(s => !string.IsNullOrWhiteSpace(s.Script))
+           .ToList()
+           .ForEach(async s => 
+           {
+               var result = await scriptService.CompileAsync(s.Script);
+               s.CompiledScript = result.Script;
+           });
     }
 
     public void Start()
