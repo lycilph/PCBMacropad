@@ -9,9 +9,17 @@ using NLog;
 
 namespace MacropadConfigurator.ViewModels;
 
-public partial class ShellViewModel : ObservableRecipient, IWindowLifecycleAware, IRecipient<EditLayerMessage>
+public partial class ShellViewModel 
+    : ObservableRecipient, 
+      IWindowLifecycleAware, 
+      IRecipient<EditLayerMessage>, 
+      IRecipient<EditShortcutMessage>, 
+      IRecipient<NavigateToMainMessage>
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+
+    private readonly MainViewModel mainViewModel;
+    private readonly EditShortcutViewModel editShortcutViewModel;
 
     private readonly SettingsService settingsService;
     private readonly OverlayService overlayService;
@@ -26,11 +34,15 @@ public partial class ShellViewModel : ObservableRecipient, IWindowLifecycleAware
     private ObservableObject content;
 
     public ShellViewModel(MainViewModel mainViewModel,
+                          EditShortcutViewModel editShortcutViewModel,
                           SettingsViewModel settingsViewModel,
                           SettingsService settingsService,
                           OverlayService overlayService,
                           IDialogCoordinator dialogCoordinator)
     {
+        this.mainViewModel = mainViewModel;
+        this.editShortcutViewModel = editShortcutViewModel;
+
         this.settingsService = settingsService;
         this.overlayService = overlayService;
         this.dialogCoordinator = dialogCoordinator;
@@ -64,7 +76,19 @@ public partial class ShellViewModel : ObservableRecipient, IWindowLifecycleAware
         if (!string.IsNullOrWhiteSpace(name))
         {
             message.Layer.Name = name.Substring(0, name.Length < 12 ? name.Length : 12);
+            WeakReferenceMessenger.Default.Send(new LogMessage($"Layer name changed to \"{message.Layer.Name}\""));
         }
+    }
+
+    public void Receive(EditShortcutMessage message)
+    {
+        editShortcutViewModel.Set(message.Shortcut);
+        Content = editShortcutViewModel;
+    }
+
+    public void Receive(NavigateToMainMessage message)
+    {
+        Content = mainViewModel;
     }
 
     [RelayCommand]

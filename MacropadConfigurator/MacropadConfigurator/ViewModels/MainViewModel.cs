@@ -33,7 +33,6 @@ public partial class MainViewModel : ObservableRecipient, IRecipient<LogMessage>
     public void Receive(LogMessage message)
     {
         logger.Info($"Got message: {message.Text}");
-
         Log.Add(message.Text);
     }
 
@@ -41,5 +40,11 @@ public partial class MainViewModel : ObservableRecipient, IRecipient<LogMessage>
     private void EditLayerName()
     {
         WeakReferenceMessenger.Default.Send(new EditLayerMessage(SelectedLayer));
+    }
+
+    [RelayCommand]
+    private void EditShortcut(Shortcut shortcut)
+    {
+        WeakReferenceMessenger.Default.Send(new EditShortcutMessage(shortcut));
     }
 }

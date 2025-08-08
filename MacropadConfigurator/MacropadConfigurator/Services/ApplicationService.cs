@@ -1,5 +1,7 @@
 ﻿using System.IO;
 using System.Text.Json;
+using System.Windows.Forms;
+using System.Windows.Input;
 using MacropadConfigurator.Models;
 using NLog;
 
@@ -86,10 +88,9 @@ public class ApplicationService
 
         Layers =
         [
-            new Layer() { Name = "Functions", IsEnabled = true },
-            new Layer() { Name = "Shortcuts", IsEnabled = true },
-            new Layer() { Name = "Misc", IsEnabled = true }
+            new Layer() { Name = "Layer 1", IsEnabled = true },
+            new Layer() { Name = "Layer 2", IsEnabled = true },
+            new Layer() { Name = "Layer 3", IsEnabled = true }
         ];
     }
-
 }

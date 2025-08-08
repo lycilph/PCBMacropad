@@ -8,7 +8,7 @@ namespace MacropadConfigurator.Models;
 public partial class Shortcut : ObservableObject
 {
     [ObservableProperty]
-    private string text = string.Empty;
+    private string text = "NA";
 
     [ObservableProperty]
     public Key key;

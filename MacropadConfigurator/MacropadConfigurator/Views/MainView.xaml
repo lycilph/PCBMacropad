@@ -75,7 +75,7 @@
                 CornerRadius="2">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <ItemsControl behaviors:ScrollViewerBehavior.AutoScroll="True"
-                            ItemsSource="{Binding Log}"/>
+                              ItemsSource="{Binding Log}"/>
             </ScrollViewer>
         </Border>
     </Grid>
