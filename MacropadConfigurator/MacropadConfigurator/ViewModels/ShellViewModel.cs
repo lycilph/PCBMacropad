@@ -23,9 +23,12 @@ public partial class ShellViewModel
 
     private readonly SettingsService settingsService;
     private readonly OverlayService overlayService;
+    private readonly CommunicationService communicationService;
+    
     private readonly IDialogCoordinator dialogCoordinator;
 
     public bool IsOverlayVisible => overlayService.IsOverlayVisible;
+    public bool IsSpinnerVisible => overlayService.IsSpinnerVisible;
     
     [ObservableProperty]
     private SettingsViewModel settingsViewModel;
@@ -38,6 +41,7 @@ public partial class ShellViewModel
                           SettingsViewModel settingsViewModel,
                           SettingsService settingsService,
                           OverlayService overlayService,
+                          CommunicationService communicationService,
                           IDialogCoordinator dialogCoordinator)
     {
         this.mainViewModel = mainViewModel;
@@ -45,14 +49,52 @@ public partial class ShellViewModel
 
         this.settingsService = settingsService;
         this.overlayService = overlayService;
+        this.communicationService = communicationService;
+
         this.dialogCoordinator = dialogCoordinator;
 
         Content = mainViewModel;
         SettingsViewModel = settingsViewModel;
 
-        overlayService.OverlayVisibilityChanged += (s, e) => OnPropertyChanged(nameof(IsOverlayVisible));
+        overlayService.OverlayVisibilityChanged += OverlayVisibilityChanged;
+        communicationService.ConfigurationLoaded += ConfigurationLoaded;
+        communicationService.ConfigurationSaved += ConfigurationSaved;
+        communicationService.ConfigurationReset += ConfigurationReset;
 
         IsActive = true;
+    }
+
+    private void OverlayVisibilityChanged(object? sender, EventArgs e)
+    {
+        OnPropertyChanged(nameof(IsOverlayVisible));
+        OnPropertyChanged(nameof(IsSpinnerVisible));
+    }
+
+    private void ConfigurationLoaded(object? sender, EventArgs e)
+    {
+        App.Current.Dispatcher.BeginInvoke(() =>
+        {
+            overlayService.HideSpinner();
+            WeakReferenceMessenger.Default.Send(new LogMessage("Configuration loaded"));
+        });
+    }
+
+    private void ConfigurationSaved(object? sender, EventArgs e)
+    {
+        App.Current.Dispatcher.BeginInvoke(() =>
+        {
+            overlayService.HideSpinner();
+            WeakReferenceMessenger.Default.Send(new LogMessage("Configuration saved"));
+        });
+    }
+
+    private void ConfigurationReset(object? sender, EventArgs e)
+    {
+        App.Current.Dispatcher.BeginInvoke(() =>
+        {
+            overlayService.HideSpinner();
+            WeakReferenceMessenger.Default.Send(new LogMessage("Configuration reset"));
+        });
     }
 
     public void OnClosing(CancelEventArgs e)
@@ -99,5 +141,29 @@ public partial class ShellViewModel
 
         overlayService.ToggleOverlay();
         SettingsViewModel.ToggleOpen();
+    }
+
+    [RelayCommand]
+    private void UploadConfiguration()
+    {
+        WeakReferenceMessenger.Default.Send(new LogMessage("Uploading configuration to macropad"));
+        overlayService.ShowSpinner();
+        communicationService.SaveConfiguration();
+    }
+
+    [RelayCommand]
+    private void DownloadConfiguration()
+    {
+        WeakReferenceMessenger.Default.Send(new LogMessage("Downloading configuration from macropad"));
+        overlayService.ShowSpinner();
+        communicationService.LoadConfiguration();
+    }
+
+    [RelayCommand]
+    private void ResetConfiguration()
+    {
+        WeakReferenceMessenger.Default.Send(new LogMessage("Resetting configuration on macropad"));
+        overlayService.ShowSpinner();
+        communicationService.ResetConfiguration();
     }
 }

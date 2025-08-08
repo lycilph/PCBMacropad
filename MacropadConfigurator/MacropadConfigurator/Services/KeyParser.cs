@@ -42,16 +42,15 @@ public static class KeyParser
         }
 
         // Check if the input string is one of our aliases
-        if (_keyNameMappings.TryGetValue(keyString, out string mappedName))
+        if (_keyNameMappings.TryGetValue(keyString, out string? mappedName) && !string.IsNullOrWhiteSpace(mappedName))
         {
             keyString = mappedName;
         }
 
         try
         {
-            // Use Enum.Parse to convert the string to a Key enum.
-            // 'true' for ignoreCase.
-            return (Key)Enum.Parse(typeof(Key), keyString, true);
+            // Use Enum.Parse to convert the string to a Key enum ('true' for ignoreCase)
+            return Enum.Parse<Key>(keyString, true);
         }
         catch (ArgumentException)
         {

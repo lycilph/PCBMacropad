@@ -1,5 +1,4 @@
 ﻿using System.Windows.Input;
-using System.Xml.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -61,14 +60,24 @@ public partial class EditShortcutViewModel : ObservableObject
     {
         if (shortcut == null) return;
         
-        
         await Task.CompletedTask;
         shortcut.Text = Text;
         shortcut.Key = KeyParser.StringToKey(Key);
         shortcut.Modifiers = (Control ? ModifierKeys.Control : ModifierKeys.None) |
                              (Shift ? ModifierKeys.Shift : ModifierKeys.None) |
                              (Alt ? ModifierKeys.Alt : ModifierKeys.None);
-        WeakReferenceMessenger.Default.Send(new NavigateToMainMessage());
+
+        if (Key != System.Windows.Input.Key.None.ToString() && shortcut.Key == System.Windows.Input.Key.None)
+        {
+            Output = $"Couldn't parse the key [{Key}]";
+        }
+        else
+        {
+            shortcut = null;
+            Output = string.Empty;
+
+            WeakReferenceMessenger.Default.Send(new NavigateToMainMessage());
+        }
 
         //(var result, var msg, var compiled_script) = await compilerService.CompileScriptAsync(Document.Text);
         //if (result && compiled_script != null)
@@ -85,9 +94,6 @@ public partial class EditShortcutViewModel : ObservableObject
         //{
         //    Output = msg;
         //}
-
-        shortcut = null;
-        Output = string.Empty;
     }
 
     [RelayCommand]

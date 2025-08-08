@@ -1,7 +1,5 @@
 ﻿using System.IO;
 using System.Text.Json;
-using System.Windows.Forms;
-using System.Windows.Input;
 using MacropadConfigurator.Models;
 using NLog;
 
@@ -39,9 +37,6 @@ public class ApplicationService
     {
         settingsService.Load(GetPath(settingsFile));
         LoadShortcuts(GetPath(shortcutsFile));
-
-        if (Layers.Count == 0)
-            CreateDefaultLayers();
     }
 
     public void Save()
@@ -80,17 +75,5 @@ public class ApplicationService
         {
             logger.Error($"Error saving shortcuts: {ex.Message}");
         }
-    }
-
-    private void CreateDefaultLayers()
-    {
-        logger.Info("Adding default layers");
-
-        Layers =
-        [
-            new Layer() { Name = "Layer 1", IsEnabled = true },
-            new Layer() { Name = "Layer 2", IsEnabled = true },
-            new Layer() { Name = "Layer 3", IsEnabled = true }
-        ];
     }
 }

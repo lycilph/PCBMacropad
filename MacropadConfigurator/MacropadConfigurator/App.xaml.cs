@@ -38,6 +38,8 @@ public partial class App : Application
         services.AddSingleton<ApplicationService>();
         services.AddSingleton<OverlayService>();
         services.AddSingleton<SettingsService>();
+        services.AddSingleton<CommunicationService>();
+        services.AddSingleton<CompilerService>();
 
         // Register view models
         services.AddTransient<ShellViewModel>();
