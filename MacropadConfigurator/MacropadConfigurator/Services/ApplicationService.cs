@@ -15,11 +15,14 @@ public class ApplicationService
 
     private readonly SettingsService settingsService;
 
+    private readonly KeyboardHook keyboardHook;
+
     public List<Layer> Layers { get; private set; } = [];
 
     public ApplicationService(SettingsService settingsService)
     {
         this.settingsService = settingsService;
+        keyboardHook = new KeyboardHook();
     }
     
     public string GetPath(string filename)
@@ -33,16 +36,21 @@ public class ApplicationService
         return Path.Combine(appFolderPath, filename);
     }
 
-    public void Load()
+    public void Start()
     {
         settingsService.Load(GetPath(settingsFile));
         LoadShortcuts(GetPath(shortcutsFile));
+
+        keyboardHook.ShortcutPressed += KeyboardHook_ShortcutPressed;
     }
 
-    public void Save()
+    public void Stop()
     {
         settingsService.Save(GetPath(settingsFile));
         SaveShortcuts(GetPath(shortcutsFile));
+
+        keyboardHook.ShortcutPressed -= KeyboardHook_ShortcutPressed;
+        keyboardHook.Dispose();
     }
 
     private void LoadShortcuts(string path)
@@ -75,5 +83,15 @@ public class ApplicationService
         {
             logger.Error($"Error saving shortcuts: {ex.Message}");
         }
+    }
+
+    private void KeyboardHook_ShortcutPressed(System.Windows.Input.Key arg1, System.Windows.Input.ModifierKeys arg2)
+    {
+        Layers
+            .Where(l => l.IsEnabled)
+            .SelectMany(l => l.Shortcuts)
+            .Where(s => s.Key == arg1 && s.Modifiers == arg2)
+            .ToList()
+            .ForEach(s => logger.Trace($"[{arg1} - {arg2}] was pressed - Triggering shortcut [{s.Text}]"));
     }
 }

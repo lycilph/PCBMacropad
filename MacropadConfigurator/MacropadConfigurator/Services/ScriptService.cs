@@ -1,5 +1,5 @@
 ﻿namespace MacropadConfigurator.Services;
 
-public class CompilerService
+public class ScriptService
 {
 }

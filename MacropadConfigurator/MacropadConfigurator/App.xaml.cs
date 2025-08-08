@@ -39,7 +39,7 @@ public partial class App : Application
         services.AddSingleton<OverlayService>();
         services.AddSingleton<SettingsService>();
         services.AddSingleton<CommunicationService>();
-        services.AddSingleton<CompilerService>();
+        services.AddSingleton<ScriptService>();
 
         // Register view models
         services.AddTransient<ShellViewModel>();
@@ -56,7 +56,7 @@ public partial class App : Application
 
         // Initialize application
         var applicationManager = Services.GetRequiredService<ApplicationService>();
-        applicationManager.Load();
+        applicationManager.Start();
 
         // Initialize the NotifyIcon
         notifyIcon = (TaskbarIcon)FindResource("NotifyIcon");
@@ -74,7 +74,7 @@ public partial class App : Application
         logger.Info("Application exiting...");
 
         var applicationManager = Services.GetRequiredService<ApplicationService>();
-        applicationManager.Save();
+        applicationManager.Stop();
 
 #pragma warning disable CA1416 // Validate platform compatibility
         notifyIcon.Dispose();
