@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using MacropadConfigurator.DTO;
 using MacropadConfigurator.Messages;
 using MacropadConfigurator.Services;
 using MahApps.Metro.Controls.Dialogs;
@@ -74,12 +75,13 @@ public partial class ShellViewModel
         OnPropertyChanged(nameof(IsSpinnerVisible));
     }
 
-    private void ConfigurationLoaded(object? sender, EventArgs e)
+    private void ConfigurationLoaded(object? sender, MacropadConfigurationDTO config)
     {
         App.Current.Dispatcher.BeginInvoke(() =>
         {
             overlayService.HideSpinner();
             WeakReferenceMessenger.Default.Send(new LogMessage("Configuration loaded"));
+            applicationService.UpdateShortcuts(config);
         });
     }
 
@@ -166,11 +168,24 @@ public partial class ShellViewModel
     }
 
     [RelayCommand]
-    private void DownloadConfiguration()
+    private async Task DownloadConfigurationAsync()
     {
-        WeakReferenceMessenger.Default.Send(new LogMessage("Downloading configuration from macropad"));
         overlayService.ShowSpinner();
-        communicationService.LoadConfiguration();
+        
+        WeakReferenceMessenger.Default.Send(new LogMessage("Searching for macropad"));
+        var result = await communicationService.FindMacropad();
+        
+        if (result)
+        {
+            WeakReferenceMessenger.Default.Send(new LogMessage("Macropad found"));
+            WeakReferenceMessenger.Default.Send(new LogMessage("Downloading configuration from macropad"));
+            communicationService.LoadConfiguration();
+        }
+        else
+        {
+            WeakReferenceMessenger.Default.Send(new LogMessage("Macropad not found. Please ensure it is connected and try again."));
+            overlayService.HideSpinner();
+        }
     }
 
     [RelayCommand]

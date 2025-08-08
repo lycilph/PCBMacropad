@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Text.Json;
+using MacropadConfigurator.DTO;
 using MacropadConfigurator.Models;
 using NLog;
 
@@ -54,10 +55,30 @@ public class ApplicationService
            });
     }
 
+    public void UpdateShortcuts(MacropadConfigurationDTO config)
+    {
+        for (int i = 0; i < Layers.Count; i++)
+        {
+            Layers[i].Update(config.layers[i]);
+        }
+    }
+
+    public void ResetShortcuts()
+    {
+        logger.Info("Resetting shortcuts");
+        Layers.ForEach(l => l.Reset());
+    }
+
     public void Start()
     {
         settingsService.Load(GetPath(settingsFile));
         LoadShortcuts(GetPath(shortcutsFile));
+
+        if (Layers.Count == 0)
+        {
+            logger.Info("No shortcuts found, adding default layers");
+            AddDefaultLayers();
+        }
 
         keyboardHook.ShortcutPressed += KeyboardHook_ShortcutPressed;
     }
@@ -103,6 +124,16 @@ public class ApplicationService
         }
     }
 
+    private void AddDefaultLayers()
+    {
+        Layers =
+        [
+            new Layer { Name = "Layer 1" },
+            new Layer { Name = "Layer 2" },
+            new Layer { Name = "Layer 3" }
+        ];
+    }
+
     private void KeyboardHook_ShortcutPressed(System.Windows.Input.Key arg1, System.Windows.Input.ModifierKeys arg2)
     {
         Layers
@@ -110,6 +141,10 @@ public class ApplicationService
             .SelectMany(l => l.Shortcuts)
             .Where(s => s.Key == arg1 && s.Modifiers == arg2)
             .ToList()
-            .ForEach(s => logger.Trace($"[{arg1} - {arg2}] was pressed - Triggering shortcut [{s.Text}]"));
+            .ForEach(s => 
+            {
+                logger.Trace($"[{arg1} - {arg2}] was pressed - Triggering shortcut [{s.Text}]");
+                scriptService.ExecuteScriptAsync(s.CompiledScript);
+            });
     }
 }

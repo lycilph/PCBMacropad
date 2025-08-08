@@ -68,7 +68,7 @@ public partial class EditShortcutViewModel : ObservableObject
         var parsed_key = KeyParser.StringToKey(Key);
         var result = await scriptService.CompileAsync(Document.Text);
 
-        if (Key != System.Windows.Input.Key.None.ToString() && shortcut.Key == System.Windows.Input.Key.None)
+        if (Key != System.Windows.Input.Key.None.ToString() && parsed_key == System.Windows.Input.Key.None)
         {
             // Error in parsing key
             Output = $"Couldn't parse the key [{Key}]";

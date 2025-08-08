@@ -26,11 +26,15 @@ struct __attribute__((packed)) Layer
 inline void loadDefaultKeymap(Layer* layers) {
   // --- LAYER 0: Functions ---
   const Layer layer0_data = {
-    "Functions", // Layer Name
+    "Workflow", // Layer Name
     true,    // isEnabled
     { // Key Actions
-      {KEY_C, MOD_LEFT_CTRL, "Copy"}, {KEY_V, MOD_LEFT_CTRL, "Paste"}, {KEY_F15, 0, "F15"},
-      {KEY_F16, 0, "F16"}, {KEY_F16, MOD_LEFT_SHIFT, "S+F16"}, {KEY_F18, 0, "F18"},
+      {KEY_F13, 0, "Open"}, 
+      {KEY_F14, 0, "Place"}, 
+      {KEY_F15, 0, "UI"},
+      {KEY_F16, 0, "Tidal"}, 
+      {KEY_F17, 0, "Notep"}, 
+      {KEY_F18, 0, "Calc"},
       {KEY_ESC, MOD_LEFT_CTRL | MOD_LEFT_SHIFT, "T.Mgr"}, 
       {KEY_X, MOD_LEFT_CTRL | MOD_LEFT_SHIFT | MOD_LEFT_ALT, "CSA+X"},
       {KEY_F21, 0, "F21"}
@@ -45,20 +49,20 @@ inline void loadDefaultKeymap(Layer* layers) {
     true,    // isEnabled
     { // Key Actions
       {KEY_C, MOD_LEFT_CTRL, "Copy"}, {KEY_V, MOD_LEFT_CTRL, "Paste"}, {KEY_X, MOD_LEFT_CTRL, "Cut"},
-      {KEY_Z, MOD_LEFT_CTRL, "Undo"}, {KEY_S, MOD_LEFT_CTRL, "Save"}, {KEY_A, MOD_LEFT_CTRL, "Sel.A"},
-      {KEY_DELETE, 0, "Del."},  {KEY_ENTER, 0, "Enter"},   {KEY_P, MOD_LEFT_GUI, "Proj"}
+      {KEY_Z, MOD_LEFT_CTRL, "Undo"}, {KEY_Y, MOD_LEFT_CTRL, "Redo"}, {KEY_S, MOD_LEFT_SHIFT, "Save"},
+      {KEY_DELETE, 0, "Del."},  {KEY_ENTER, 0, "Enter"},   {KEY_ESC, 0, "Esc"}
     }
   };
   layers[1] = layer1_data;
 
   // --- LAYER 2: Media ---
   const Layer layer2_data = {
-    "Media", // Layer Name
+    "Misc", // Layer Name
     true,    // isEnabled
     { // Key Actions
-      {KEY_A, 0, "Mute"}, {KEY_B, 0, "Vol-"}, {KEY_C, 0, "Vol+"},
-      {KEY_D, 0, "Prev"}, {KEY_E, 0, "Play"}, {KEY_F, 0, "Next"},
-      {KEY_ESC, 0, "Esc"}, {KEY_TAB, 0, "Tab"}, {KEY_L, MOD_LEFT_GUI, "Lock"}
+      {KEY_Q, 0, "Q"}, {KEY_W, 0, "W"}, {KEY_E, 0, "E"},
+      {KEY_A, 0, "A"}, {KEY_S, 0, "S"}, {KEY_D, 0, "D"},
+      {KEY_Z, 0, "Z"}, {KEY_X, 0, "X"}, {KEY_C, 0, "C"}
     }
   };
   layers[2] = layer2_data;

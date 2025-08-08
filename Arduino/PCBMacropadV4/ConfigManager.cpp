@@ -47,7 +47,7 @@ void ConfigManager::saveConfig(Layer* layers) {
   const size_t dataSize = sizeof(Layer) * NUM_LAYERS;
   uint8_t buffer[dataSize]; // Create a temporary buffer on the stack
   serializeConfig(layers, buffer, dataSize);
-  EEPROM.put(EEPROM_ADDRESS+ sizeof(EEPROM_VERSION), buffer);
+  EEPROM.put(EEPROM_ADDRESS + sizeof(EEPROM_VERSION), buffer);
 
   DEBUG_PRINTLN(F("Saving config done."));
 }

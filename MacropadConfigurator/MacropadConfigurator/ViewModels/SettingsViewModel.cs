@@ -12,6 +12,7 @@ public partial class SettingsViewModel : ObservableObject
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
     
+    private readonly ApplicationService application_service;
     private readonly SettingsService settings_service;
 
     [ObservableProperty]
@@ -51,8 +52,9 @@ public partial class SettingsViewModel : ObservableObject
         }
     }
 
-    public SettingsViewModel(SettingsService settings_service)
+    public SettingsViewModel(ApplicationService application_service, SettingsService settings_service)
     {
+        this.application_service = application_service;
         this.settings_service = settings_service;
 
         ApplicationColors = settings_service.Themes.ToObservableCollection();
@@ -67,6 +69,13 @@ public partial class SettingsViewModel : ObservableObject
     partial void OnSelectedApplicationColorChanged(Theme value) => settings_service.SetColorScheme(value.ColorScheme);
 
     public void ToggleOpen() => IsOpen = !IsOpen;
+
+    [RelayCommand]
+    public void ResetConfiguration()
+    {
+        logger.Info("Resetting configuration");
+        application_service.ResetShortcuts();
+    }
 
     [RelayCommand]
     public void Exit()
