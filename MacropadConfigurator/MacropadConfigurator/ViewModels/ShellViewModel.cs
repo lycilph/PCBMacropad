@@ -63,7 +63,6 @@ public partial class ShellViewModel
 
         overlayService.OverlayVisibilityChanged += OverlayVisibilityChanged;
         communicationService.ConfigurationLoaded += ConfigurationLoaded;
-        communicationService.ConfigurationReset += ConfigurationReset;
 
         IsActive = true;
     }
@@ -81,15 +80,6 @@ public partial class ShellViewModel
             overlayService.HideSpinner();
             WeakReferenceMessenger.Default.Send(new LogMessage("Configuration loaded"));
             applicationService.UpdateShortcuts(config);
-        });
-    }
-
-    private void ConfigurationReset(object? sender, EventArgs e)
-    {
-        App.Current.Dispatcher.BeginInvoke(() =>
-        {
-            overlayService.HideSpinner();
-            WeakReferenceMessenger.Default.Send(new LogMessage("Configuration reset"));
         });
     }
 
@@ -194,10 +184,25 @@ public partial class ShellViewModel
     }
 
     [RelayCommand]
-    private void ResetConfiguration()
+    private async Task ResetConfigurationAsync()
     {
         WeakReferenceMessenger.Default.Send(new LogMessage("Resetting configuration on macropad"));
         overlayService.ShowSpinner();
-        communicationService.ResetConfiguration();
+
+        WeakReferenceMessenger.Default.Send(new LogMessage("Searching for macropad"));
+        var result = await communicationService.FindMacropad();
+
+        if (result)
+        {
+            var config = applicationService.GetConfiguration();
+            await Task.Run(communicationService.ResetConfiguration);
+            WeakReferenceMessenger.Default.Send(new LogMessage("Configuration reset successfully"));
+        }
+        else
+        {
+            WeakReferenceMessenger.Default.Send(new LogMessage("Macropad not found. Please ensure it is connected and try again."));
+        }
+
+        overlayService.HideSpinner();
     }
 }

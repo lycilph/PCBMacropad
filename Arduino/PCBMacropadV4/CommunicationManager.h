@@ -9,6 +9,7 @@
 const uint8_t CMD_PC_GET_CONFIG = 'G';
 const uint8_t CMD_PC_SET_CONFIG = 'S';
 const uint8_t CMD_PC_CONFIG_DATA = 'D';
+const uint8_t CMD_PC_RESET_CONFIG = 'R';
 
 const uint8_t CMD_ARDUINO_SEND_CONFIG = 'C';
 const uint8_t CMD_ARDUINO_CONFIG_DATA = 'D';
@@ -29,6 +30,7 @@ private:
   void handleGetConfig();
   void handleSetConfig();
   void handleConfigData();
+  void handleResetConfig();
 
   Layer* layers;
   ConfigManager* configManager;

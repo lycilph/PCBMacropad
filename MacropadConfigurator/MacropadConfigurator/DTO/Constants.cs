@@ -16,6 +16,7 @@ public static class Constants
     public const byte CMD_PC_GET_CONFIG = (byte)'G';
     public const byte CMD_PC_SET_CONFIG = (byte)'S';
     public const byte CMD_PC_CONFIG_DATA = (byte)'D';
+    public const byte CMD_PC_RESET_CONFIG = (byte)'R';
 
     public const byte CMD_ARDUINO_SEND_CONFIG = (byte)'C';
     public const byte CMD_ARDUINO_CONFIG_DATA = (byte)'D';

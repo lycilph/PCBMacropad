@@ -22,7 +22,6 @@ public class CommunicationService
     private int expectedBytesToReceive = 0;
 
     public event EventHandler<MacropadConfigurationDTO>? ConfigurationLoaded;
-    public event EventHandler? ConfigurationReset;
 
     public Task<bool> FindMacropad()
     {
@@ -202,8 +201,27 @@ public class CommunicationService
 
     public void ResetConfiguration()
     {
-        Task.Delay(2000)
-            .ContinueWith(_ => OnConfigurationReset());
+        
+
+        if (device == null)
+        {
+            logger.Error("Cannot load configuration: No device found");
+            return;
+        }
+
+        if (device.TryOpen(out stream))
+        {
+            logger.Info("Stream opened successfully");
+
+            reportLength = device.GetMaxOutputReportLength();
+
+            var requestPacket = new byte[] { Constants.RawHidInputReportId, Constants.CMD_PC_RESET_CONFIG };
+            logger.Info("Sending config reset request command to Arduino...");
+            stream.Write(requestPacket);
+
+            stream?.Close();
+        }
+        device = null;
     }
 
     public void OnConfigurationLoaded(MacropadConfigurationDTO config)
@@ -212,8 +230,6 @@ public class CommunicationService
         device = null;
         ConfigurationLoaded?.Invoke(this, config);
     }
-
-    public void OnConfigurationReset() => ConfigurationReset?.Invoke(this, EventArgs.Empty);
 
     private static byte[] StructToByteArray<T>(T obj)
     {

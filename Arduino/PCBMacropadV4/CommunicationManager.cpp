@@ -26,6 +26,8 @@ void CommunicationManager::update() {
       handleSetConfig();
     }  else if (command == CMD_PC_CONFIG_DATA) {
       handleConfigData();
+    }  else if (command == CMD_PC_RESET_CONFIG) {
+      handleResetConfig();
     }
     // Add a command to reset the macropad
     // Should call the factoryReset in the config manager class (and save the reset config to eeprom)
@@ -110,4 +112,10 @@ void CommunicationManager::handleConfigData() {
     totalDataSize = 0;
     DEBUG_PRINTLN("\nWaiting for next command.");
   }
+}
+
+void CommunicationManager::handleResetConfig() {
+  configManager->factoryReset(layers);
+  configManager->saveConfig(layers);
+  delay(1000);
 }
