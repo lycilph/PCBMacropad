@@ -11,7 +11,7 @@ public class ScriptService
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-    private readonly ScriptHost host = new();
+    private readonly ScriptHost host = new(App.Current);
 
     public async void ExecuteScriptAsync(Script<object>? script)
     {
