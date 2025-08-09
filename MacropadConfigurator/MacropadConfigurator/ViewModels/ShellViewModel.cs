@@ -63,7 +63,6 @@ public partial class ShellViewModel
 
         overlayService.OverlayVisibilityChanged += OverlayVisibilityChanged;
         communicationService.ConfigurationLoaded += ConfigurationLoaded;
-        communicationService.ConfigurationSaved += ConfigurationSaved;
         communicationService.ConfigurationReset += ConfigurationReset;
 
         IsActive = true;
@@ -82,15 +81,6 @@ public partial class ShellViewModel
             overlayService.HideSpinner();
             WeakReferenceMessenger.Default.Send(new LogMessage("Configuration loaded"));
             applicationService.UpdateShortcuts(config);
-        });
-    }
-
-    private void ConfigurationSaved(object? sender, EventArgs e)
-    {
-        App.Current.Dispatcher.BeginInvoke(() =>
-        {
-            overlayService.HideSpinner();
-            WeakReferenceMessenger.Default.Send(new LogMessage("Configuration saved"));
         });
     }
 
@@ -160,11 +150,26 @@ public partial class ShellViewModel
     }
 
     [RelayCommand]
-    private void UploadConfiguration()
+    private async Task UploadConfigurationAsync()
     {
         WeakReferenceMessenger.Default.Send(new LogMessage("Uploading configuration to macropad"));
         overlayService.ShowSpinner();
-        communicationService.SaveConfiguration();
+
+        WeakReferenceMessenger.Default.Send(new LogMessage("Searching for macropad"));
+        var result = await communicationService.FindMacropad();
+
+        if (result)
+        {
+            var config = applicationService.GetConfiguration();
+            await Task.Run(() => communicationService.SaveConfiguration(config));
+            WeakReferenceMessenger.Default.Send(new LogMessage("Configuration uploaded successfully"));
+        }
+        else
+        {
+            WeakReferenceMessenger.Default.Send(new LogMessage("Macropad not found. Please ensure it is connected and try again."));
+        }
+
+        overlayService.HideSpinner();
     }
 
     [RelayCommand]

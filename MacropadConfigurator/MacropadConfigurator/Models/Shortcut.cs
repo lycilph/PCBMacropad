@@ -33,6 +33,16 @@ public partial class Shortcut : ObservableObject
         Modifiers = KeyParser.HidModifiersToKeys(dto.modifier);
     }
 
+    public MacropadButtonDTO ToDto()
+    {
+        return new MacropadButtonDTO
+        {
+            text = Text,
+            key = KeyParser.KeyToHid(Key),
+            modifier = KeyParser.KeysToHidModifiers(Modifiers)
+        };
+    }
+
     public void Reset()
     {
         Text = "NA";

@@ -33,7 +33,7 @@ Keypad keypad = Keypad( makeKeymap(keys), colPins, rowPins, ROWS, COLS );
 Layer allLayers[NUM_LAYERS];
 ConfigManager configManager;
 Macropad macropad(allLayers, &keypad, &display);
-CommunicationManager communicationManager(allLayers);
+CommunicationManager communicationManager(allLayers, &configManager);
 
 bool hasSlept = false;
 

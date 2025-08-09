@@ -15,6 +15,7 @@ struct __attribute__((packed)) KeyAction
    uint16_t modifier;
    char text[BUTTON_TEXT_LENGTH];
 };
+
 struct __attribute__((packed)) Layer
 {
   char name[LAYER_TEXT_LENGTH];

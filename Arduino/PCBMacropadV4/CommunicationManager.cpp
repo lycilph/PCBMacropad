@@ -1,8 +1,8 @@
 #include "CommunicationManager.h"
 #include "config.h"
 
-CommunicationManager::CommunicationManager(Layer* layerData)
-  : layers(layerData) {}
+CommunicationManager::CommunicationManager(Layer* layerData, ConfigManager *cfgMgr)
+  : layers(layerData), configManager(cfgMgr) {}
 
 void CommunicationManager::begin() {
   RawHID.begin(rawhidData, sizeof(rawhidData));
@@ -53,7 +53,7 @@ void CommunicationManager::handleGetConfig() {
   RawHID.write(packetBuffer, RAW_HID_PAYLOAD_SIZE);
   bytesSent += firstChunkSize;
 
-  Serial.println("First packet sent");
+  DEBUG_PRINTLN("First packet sent");
 
   delay(5); // Crucial delay for the PC to process the packet
 
@@ -68,18 +68,46 @@ void CommunicationManager::handleGetConfig() {
     RawHID.write(packetBuffer, RAW_HID_PAYLOAD_SIZE);
     bytesSent += chunkSize;
 
-    Serial.println("Data packet sent");
+    DEBUG_PRINTLN("Data packet sent");
 
     delay(5); // Crucial delay for the PC to process the packet
   }
 }
 
 void CommunicationManager::handleSetConfig() {
-  // Allocate buffer for the incoming configuration here (see https://cplusplus.com/reference/cstdlib/malloc/)
-  // Check that there is enough free ram before and after....
+  bytesReceived = 0;
+  totalDataSize = packetBuffer[1] | (packetBuffer[2] << 8);
+
+  if (totalDataSize > MAX_BUFFER_SIZE) {
+    DEBUG_PRINTLN("Error: Requested transfer size is too large.");
+    totalDataSize = 0;
+    return;
+  }
+
+  DEBUG_PRINT("Received START command. Expecting ");
+  DEBUG_PRINT(totalDataSize);
+  DEBUG_PRINTLN(" bytes.");
+
+  int dataLength = RAW_HID_PAYLOAD_SIZE - PROTOCOL_HEADER_SIZE;
+  memcpy(&configDataBuffer[bytesReceived], &packetBuffer[3], dataLength);
+  bytesReceived += dataLength;
 }
 
 void CommunicationManager::handleConfigData() {
-  // When done free the allocated buffer (see https://cplusplus.com/reference/cstdlib/free/)
-  // Check that there is enough free ram before and after....
+  int dataLength = RAW_HID_PAYLOAD_SIZE - 1; // Cmd
+  memcpy(&configDataBuffer[bytesReceived], &packetBuffer[1], dataLength);
+  bytesReceived += dataLength;
+
+  DEBUG_PRINTLN("Received data packet");
+
+  if (bytesReceived >= totalDataSize) {
+    DEBUG_PRINTLN("\n--- PC->Arduino Transfer Complete! ---");
+
+    memcpy(layers, configDataBuffer, CONFIG_DATA_SIZE);
+    configManager->saveConfig(layers);
+
+    bytesReceived = 0;
+    totalDataSize = 0;
+    DEBUG_PRINTLN("\nWaiting for next command.");
+  }
 }

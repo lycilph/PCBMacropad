@@ -34,6 +34,16 @@ public partial class Layer : ObservableObject
             Shortcuts[i].Update(dto.buttons[i]);
     }
 
+    public MacropadLayerDTO ToDto()
+    {
+        return new MacropadLayerDTO
+        {
+            name = Name,
+            isEnabled = IsEnabled,
+            buttons = Shortcuts.Select(s => s.ToDto()).ToArray()
+        };
+    }
+
     public void Reset()
     {
         Name = "NA";

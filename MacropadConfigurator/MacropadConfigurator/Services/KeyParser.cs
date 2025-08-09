@@ -184,6 +184,21 @@ public static class KeyParser
         return Key.None;
     }
 
+    /// <summary>
+    /// Converts a System.Windows.Input.Key to its corresponding USB HID Usage ID.
+    /// </summary>
+    /// <param name="key">The key to convert.</param>
+    /// <returns>The HID Usage ID as a byte, or 0 if the key is not mapped (e.g., modifiers).</returns>
+    public static byte KeyToHid(Key key)
+    {
+        if (_keyToHidMap.TryGetValue(key, out byte hidCode))
+        {
+            return hidCode;
+        }
+        // Return 0 for unmapped keys, which is 'HID_KEY_NONE'
+        return 0;
+    }
+
     public static ModifierKeys HidModifiersToKeys(ushort hidModifiers)
     {
         var mods = ModifierKeys.None;
@@ -195,5 +210,25 @@ public static class KeyParser
             }
         }
         return mods;
+    }
+
+    public static ushort KeysToHidModifiers(ModifierKeys mods)
+    {
+        ushort hidModifiers = 0;
+
+        if ((mods & ModifierKeys.Control) == ModifierKeys.Control)
+        {
+            hidModifiers |= MOD_LEFT_CTRL_BIT;
+        }
+        if ((mods & ModifierKeys.Shift) == ModifierKeys.Shift)
+        {
+            hidModifiers |= MOD_LEFT_SHIFT_BIT;
+        }
+        if ((mods & ModifierKeys.Alt) == ModifierKeys.Alt)
+        {
+            hidModifiers |= MOD_LEFT_ALT_BIT;
+        }
+
+        return hidModifiers;
     }
 }

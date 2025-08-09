@@ -22,7 +22,6 @@ public class CommunicationService
     private int expectedBytesToReceive = 0;
 
     public event EventHandler<MacropadConfigurationDTO>? ConfigurationLoaded;
-    public event EventHandler? ConfigurationSaved;
     public event EventHandler? ConfigurationReset;
 
     public Task<bool> FindMacropad()
@@ -143,10 +142,62 @@ public class CommunicationService
         }
     }
 
-    public void SaveConfiguration()
+    public void SaveConfiguration(MacropadConfigurationDTO config)
     {
-        Task.Delay(2000)
-            .ContinueWith(_ => OnConfigurationSaved());
+        if (device == null)
+        {
+            logger.Error("Cannot load configuration: No device found");
+            return;
+        }
+
+        if (device.TryOpen(out stream))
+        {
+            logger.Info("Stream opened successfully");
+            
+            reportLength = device.GetMaxOutputReportLength();
+
+            var configData = StructToByteArray(config);
+            logger.Info($"Sending {configData.Length} bytes to the device.");
+
+            int payloadSize = reportLength - 1;
+            int bytesSent = 0;
+
+            // First config Packet
+            var packet = new byte[reportLength];
+            packet[0] = Constants.RawHidInputReportId;
+            packet[1] = Constants.CMD_PC_SET_CONFIG;
+            packet[2] = (byte)(configData.Length & 0xFF);
+            packet[3] = (byte)((configData.Length >> 8) & 0xFF);
+
+            int firstChunkSize = payloadSize - 3;
+            Array.Copy(configData, 0, packet, 4, firstChunkSize);
+            stream.Write(packet);
+
+            logger.Info($"Sent first chunk of {firstChunkSize} bytes.");
+
+            bytesSent += firstChunkSize;
+            Thread.Sleep(20);
+
+            // DATA Packets
+            while (bytesSent < configData.Length)
+            {
+                packet[0] = Constants.RawHidInputReportId;
+                packet[1] = Constants.CMD_PC_CONFIG_DATA;
+
+                int chunkSize = Math.Min(payloadSize - 1, configData.Length - bytesSent);
+                Array.Copy(configData, bytesSent, packet, 2, chunkSize);
+                stream.Write(packet);
+
+                logger.Info($"Sent data chunk of {firstChunkSize} bytes.");
+
+                bytesSent += chunkSize;
+                Thread.Sleep(20);
+            }
+            logger.Info("Finished sending all data packets.");
+
+            stream?.Close();
+        }
+        device = null;
     }
 
     public void ResetConfiguration()
@@ -161,7 +212,7 @@ public class CommunicationService
         device = null;
         ConfigurationLoaded?.Invoke(this, config);
     }
-    public void OnConfigurationSaved() => ConfigurationSaved?.Invoke(this, EventArgs.Empty);
+
     public void OnConfigurationReset() => ConfigurationReset?.Invoke(this, EventArgs.Empty);
 
     private static byte[] StructToByteArray<T>(T obj)

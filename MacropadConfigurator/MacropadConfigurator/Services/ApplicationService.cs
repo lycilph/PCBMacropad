@@ -58,9 +58,15 @@ public class ApplicationService
     public void UpdateShortcuts(MacropadConfigurationDTO config)
     {
         for (int i = 0; i < Layers.Count; i++)
-        {
             Layers[i].Update(config.layers[i]);
-        }
+    }
+
+    public MacropadConfigurationDTO GetConfiguration()
+    {
+        return new MacropadConfigurationDTO
+        {
+            layers = Layers.Select(l => l.ToDto()).ToArray()
+        };
     }
 
     public void ResetShortcuts()
