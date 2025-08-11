@@ -7,6 +7,9 @@ Macropad::Macropad(Layer* layerData, Keypad* keypad, SSD1306AsciiAvrI2c* display
 void Macropad::begin() {
   updateDisplay();
 
+  // Initialize the invert oled timestamp
+  invertOledTimestamp = millis();
+
   // Sends a clean report to the host. This is important on any Arduino type.
   Keyboard.begin();
   Consumer.begin();
