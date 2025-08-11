@@ -35,6 +35,40 @@ public class ScriptService
         }
     }
 
+    public async Task<ScriptState<object>> RunAsync(string script)
+    {
+        var options = ScriptOptions.Default
+                .AddReferences(
+                    typeof(Process).Assembly,
+                    typeof(MessageBox).Assembly,
+                    typeof(ScriptHost).Assembly
+                )
+                .AddImports(
+                    "System",
+                    "System.Diagnostics",
+                    "System.Windows"
+                 );
+
+        return await CSharpScript.RunAsync(script, options, host, globalsType: typeof(ScriptHost));
+    }
+
+    public async Task<ScriptState<object>> RunAsync(string script, ScriptState<object> state)
+    {
+        var options = ScriptOptions.Default
+                .AddReferences(
+                    typeof(Process).Assembly,
+                    typeof(MessageBox).Assembly,
+                    typeof(ScriptHost).Assembly
+                )
+                .AddImports(
+                    "System",
+                    "System.Diagnostics",
+                    "System.Windows"
+                 );
+
+        return await state.ContinueWithAsync(script, options);
+    }
+
     public Task<CompilationResult> CompileAsync(string script)
     {
         var options = ScriptOptions.Default

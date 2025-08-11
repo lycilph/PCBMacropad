@@ -1,0 +1,64 @@
+﻿<UserControl x:Class="MacropadConfigurator.Views.EditMasterScriptView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ae="http://icsharpcode.net/sharpdevelop/avalonedit"
+             xmlns:icon="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             xmlns:local="clr-namespace:MacropadConfigurator.Views"
+             xmlns:vm="clr-namespace:MacropadConfigurator.ViewModels"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             d:DataContext="{d:DesignInstance Type=vm:EditShortcutViewModel, IsDesignTimeCreatable=False}">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0"
+                   Text="Master script"/>
+
+        <ae:TextEditor Grid.Row="1"
+                       Margin="0 10 0 0"
+                       SyntaxHighlighting="C#"
+                       FontFamily="Consolas"
+                       FontSize="10pt"
+                       WordWrap="True"
+                       BorderThickness="1"
+                       BorderBrush="Black"
+                       Document="{Binding Document}"/>
+
+        <TextBox Grid.Row="2"
+                 Margin="0 10 0 0"
+                 IsReadOnly="True"
+                 Text="{Binding Output}"/>
+
+        <Grid Grid.Row="3" 
+              Margin="0 10 0 0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0"
+                    Content="{icon:Lucide Kind=Check}"
+                    ToolTip="Verify script"
+                    HorizontalAlignment="Left"
+                    Command="{Binding CompileCommand}"/>
+
+            <Button Grid.Column="1"
+                    Content="Save"
+                    Width="75"
+                    Command="{Binding SaveCommand}"/>
+            <Button Grid.Column="2"
+                    Content="Cancel"
+                    Width="75"
+                    Margin="10 0 0 0"
+                    Command="{Binding CancelCommand}"/>
+        </Grid>
+    </Grid>
+</UserControl>

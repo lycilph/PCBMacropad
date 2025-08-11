@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Text.Json;
-using MacropadConfigurator.DTO;
 using MacropadConfigurator.Models;
 using NLog;
 
@@ -19,7 +18,8 @@ public class ApplicationService
 
     private readonly KeyboardHook keyboardHook;
 
-    public List<Layer> Layers { get; private set; } = [];
+    //public List<Layer> Layers { get; private set; } = [];
+    public Configuration Configuration { get; private set; } = new();
 
     public ApplicationService(SettingsService settingsService, ScriptService scriptService)
     {
@@ -40,11 +40,15 @@ public class ApplicationService
         return Path.Combine(appFolderPath, filename);
     }
 
-    public void InitializeScripts()
+    public async Task InitializeScriptsAsync()
     {
         logger.Info("Compiling scripts");
 
-        Layers
+        var result = await scriptService.CompileAsync(Configuration.MasterScript.Script);
+        Configuration.MasterScript.CompiledScript = result.Script;
+        Configuration.MasterScript.MasterScriptState = await scriptService.RunAsync(Configuration.MasterScript.Script);
+
+        Configuration.Layers
            .SelectMany(l => l.Shortcuts)
            .Where(s => !string.IsNullOrWhiteSpace(s.Script))
            .ToList()
@@ -55,35 +59,15 @@ public class ApplicationService
            });
     }
 
-    public void UpdateShortcuts(MacropadConfigurationDTO config)
-    {
-        for (int i = 0; i < Layers.Count; i++)
-            Layers[i].Update(config.layers[i]);
-    }
-
-    public MacropadConfigurationDTO GetConfiguration()
-    {
-        return new MacropadConfigurationDTO
-        {
-            layers = Layers.Select(l => l.ToDto()).ToArray()
-        };
-    }
-
-    public void ResetShortcuts()
-    {
-        logger.Info("Resetting shortcuts");
-        Layers.ForEach(l => l.Reset());
-    }
-
     public void Start()
     {
         settingsService.Load(GetPath(settingsFile));
         LoadShortcuts(GetPath(shortcutsFile));
 
-        if (Layers.Count == 0)
+        if (Configuration.Layers.Count == 0)
         {
             logger.Info("No shortcuts found, adding default layers");
-            AddDefaultLayers();
+            Configuration.CreateDefaultLayers();
         }
 
         keyboardHook.ShortcutPressed += KeyboardHook_ShortcutPressed;
@@ -105,7 +89,7 @@ public class ApplicationService
         try
         {
             string jsonString = File.ReadAllText(path);
-            Layers = JsonSerializer.Deserialize<List<Layer>>(jsonString) ?? [];
+            Configuration = JsonSerializer.Deserialize<Configuration>(jsonString) ?? new Configuration();
         }
         catch (Exception ex)
         {
@@ -121,7 +105,7 @@ public class ApplicationService
         {
             // Configure the serializer to write indented JSON for readability.
             var options = new JsonSerializerOptions { WriteIndented = true };
-            string jsonString = JsonSerializer.Serialize(Layers, options);
+            string jsonString = JsonSerializer.Serialize(Configuration, options);
             File.WriteAllText(path, jsonString);
         }
         catch (Exception ex)
@@ -130,19 +114,9 @@ public class ApplicationService
         }
     }
 
-    private void AddDefaultLayers()
-    {
-        Layers =
-        [
-            new Layer { Name = "Layer 1" },
-            new Layer { Name = "Layer 2" },
-            new Layer { Name = "Layer 3" }
-        ];
-    }
-
     private void KeyboardHook_ShortcutPressed(System.Windows.Input.Key arg1, System.Windows.Input.ModifierKeys arg2)
     {
-        Layers
+        Configuration.Layers
             .Where(l => l.IsEnabled)
             .SelectMany(l => l.Shortcuts)
             .Where(s => s.Key == arg1 && s.Modifiers == arg2)

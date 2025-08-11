@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HidCommunicationTestV3", "H
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HidCommunicationTestV4", "HidCommunicationTestV4\HidCommunicationTestV4.csproj", "{5C755641-3D7C-4AA8-9975-00553CD0A1DA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptingTest", "ScriptingTest\ScriptingTest.csproj", "{BD046F6B-8752-4A6E-B43A-060324D8891A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{5C755641-3D7C-4AA8-9975-00553CD0A1DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5C755641-3D7C-4AA8-9975-00553CD0A1DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5C755641-3D7C-4AA8-9975-00553CD0A1DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD046F6B-8752-4A6E-B43A-060324D8891A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD046F6B-8752-4A6E-B43A-060324D8891A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD046F6B-8752-4A6E-B43A-060324D8891A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD046F6B-8752-4A6E-B43A-060324D8891A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

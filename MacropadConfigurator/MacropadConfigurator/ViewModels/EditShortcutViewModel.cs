@@ -11,6 +11,7 @@ namespace MacropadConfigurator.ViewModels;
 
 public partial class EditShortcutViewModel : ObservableObject
 {
+    private readonly ApplicationService applicationService;
     private readonly ScriptService scriptService;
 
     private Shortcut? shortcut;
@@ -36,8 +37,9 @@ public partial class EditShortcutViewModel : ObservableObject
     [ObservableProperty]
     private string output = string.Empty;
 
-    public EditShortcutViewModel(ScriptService scriptService)
+    public EditShortcutViewModel(ApplicationService applicationService, ScriptService scriptService)
     {
+        this.applicationService = applicationService;
         this.scriptService = scriptService;
     }
 
@@ -56,8 +58,12 @@ public partial class EditShortcutViewModel : ObservableObject
     [RelayCommand]
     private async Task CompileAsync()
     {
-        var result = await scriptService.CompileAsync(Document.Text);
-        Output = result.Success ? "Success" : result.Message;
+        //var result = await scriptService.CompileAsync(Document.Text);
+        //Output = result.Success ? "Success" : result.Message;
+
+        var ms = applicationService.Configuration.MasterScript;
+        if (ms.MasterScriptState != null)
+            await scriptService.RunAsync(Document.Text, ms.MasterScriptState);
     }
 
     [RelayCommand]

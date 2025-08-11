@@ -27,7 +27,7 @@ public partial class MainViewModel : ObservableRecipient, IRecipient<LogMessage>
     {
         this.scriptService = scriptService;
 
-        Layers = applicationService.Layers;
+        Layers = applicationService.Configuration.Layers;
         selectedLayer = Layers.First();
 
         IsActive = true;

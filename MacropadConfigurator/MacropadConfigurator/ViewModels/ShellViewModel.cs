@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -16,12 +15,14 @@ public partial class ShellViewModel
       IWindowLifecycleAware, 
       IRecipient<EditLayerMessage>, 
       IRecipient<EditShortcutMessage>, 
+      IRecipient<EditMasterScriptMessage>,
       IRecipient<NavigateToMainMessage>
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
     private readonly MainViewModel mainViewModel;
     private readonly EditShortcutViewModel editShortcutViewModel;
+    private readonly EditMasterScriptViewModel editMasterScriptViewModel;
 
     private readonly ApplicationService applicationService;
     private readonly SettingsService settingsService;
@@ -41,6 +42,7 @@ public partial class ShellViewModel
 
     public ShellViewModel(MainViewModel mainViewModel,
                           EditShortcutViewModel editShortcutViewModel,
+                          EditMasterScriptViewModel editMasterScriptViewModel,
                           SettingsViewModel settingsViewModel,
                           ApplicationService applicationService,
                           SettingsService settingsService,
@@ -50,6 +52,7 @@ public partial class ShellViewModel
     {
         this.mainViewModel = mainViewModel;
         this.editShortcutViewModel = editShortcutViewModel;
+        this.editMasterScriptViewModel = editMasterScriptViewModel;
 
         this.applicationService = applicationService;
         this.settingsService = settingsService;
@@ -79,17 +82,17 @@ public partial class ShellViewModel
         {
             overlayService.HideSpinner();
             WeakReferenceMessenger.Default.Send(new LogMessage("Configuration loaded"));
-            applicationService.UpdateShortcuts(config);
+            applicationService.Configuration.Update(config);
         });
     }
 
-    public void OnLoaded()
+    public async void OnLoaded()
     {
         logger.Info("Shell is now loaded");
         WeakReferenceMessenger.Default.Send(new LogMessage("Application is ready"));
 
         overlayService.ShowSpinner();
-        applicationService.InitializeScripts();
+        await applicationService.InitializeScriptsAsync();
         overlayService.HideSpinner();
     }
 
@@ -124,6 +127,15 @@ public partial class ShellViewModel
         Content = editShortcutViewModel;
     }
 
+    public void Receive(EditMasterScriptMessage message)
+    {
+        editMasterScriptViewModel.Activate();
+        Content = editMasterScriptViewModel;
+
+        overlayService.ToggleOverlay();
+        SettingsViewModel.ToggleOpen();
+    }
+
     public void Receive(NavigateToMainMessage message)
     {
         Content = mainViewModel;
@@ -150,7 +162,7 @@ public partial class ShellViewModel
 
         if (result)
         {
-            var config = applicationService.GetConfiguration();
+            var config = applicationService.Configuration.ToDto();
             await Task.Run(() => communicationService.SaveConfiguration(config));
             WeakReferenceMessenger.Default.Send(new LogMessage("Configuration uploaded successfully"));
         }
@@ -194,7 +206,6 @@ public partial class ShellViewModel
 
         if (result)
         {
-            var config = applicationService.GetConfiguration();
             await Task.Run(communicationService.ResetConfiguration);
             WeakReferenceMessenger.Default.Send(new LogMessage("Configuration reset successfully"));
         }

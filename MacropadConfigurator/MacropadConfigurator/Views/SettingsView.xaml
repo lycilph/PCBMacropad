@@ -72,9 +72,15 @@
                   Header="Actions"
                   Margin="0 10 0 0"
                   Padding="10">
-            <Button Content="Reset configuration"
-                    Command="{Binding ResetConfigurationCommand}"
-                    HorizontalAlignment="Left"/>
+            <StackPanel>
+                <Button Content="Reset configuration"
+                        Command="{Binding ResetConfigurationCommand}"
+                        HorizontalAlignment="Left"/>
+                <Button Content="Edit master script"
+                        HorizontalAlignment="Left"
+                        Command="{Binding EditMasterScriptCommand}"
+                        Margin="0 5 0 0"/>
+            </StackPanel>
         </GroupBox>
 
         <Button Grid.Row="3"

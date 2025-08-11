@@ -1,8 +1,10 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using ControlzEx.Theming;
 using MacropadConfigurator.Extensions;
+using MacropadConfigurator.Messages;
 using MacropadConfigurator.Services;
 using NLog;
 
@@ -74,7 +76,13 @@ public partial class SettingsViewModel : ObservableObject
     public void ResetConfiguration()
     {
         logger.Info("Resetting configuration");
-        application_service.ResetShortcuts();
+        application_service.Configuration.Reset();
+    }
+
+    [RelayCommand]
+    public void EditMasterScript()
+    {
+        WeakReferenceMessenger.Default.Send(new EditMasterScriptMessage());
     }
 
     [RelayCommand]

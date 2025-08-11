@@ -46,6 +46,7 @@ public partial class App : Application
         services.AddTransient<MainViewModel>();
         services.AddTransient<SettingsViewModel>();
         services.AddTransient<EditShortcutViewModel>();
+        services.AddTransient<EditMasterScriptViewModel>();
 
         return services.BuildServiceProvider();
     }

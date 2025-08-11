@@ -65,6 +65,10 @@
             <DataTemplate DataType="{x:Type vm:EditShortcutViewModel}">
                 <v:EditShortcutView/>
             </DataTemplate>
+
+            <DataTemplate DataType="{x:Type vm:EditMasterScriptViewModel}">
+                <v:EditMasterScriptView/>
+            </DataTemplate>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
