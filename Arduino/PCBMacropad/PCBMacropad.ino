@@ -1,33 +1,21 @@
-#include <HID-Project.h>
-#include <Keypad.h>
 #include <EncoderButton.h>
 #include <LowPower.h>
-#include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
 
-#define SCREEN_WIDTH 128 // OLED display width, in pixels
-#define SCREEN_HEIGHT 64 // OLED display height, in pixels
+#include "Keymap.h"
+#include "ConfigManager.h"
+#include "Macropad.h"
+#include "config.h"
+#include "CommunicationManager.h"
 
-// Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
-// The pins for I2C are defined by the Wire-library. 
-// On an arduino UNO:       A4(SDA), A5(SCL)
-// On an arduino MEGA 2560: 20(SDA), 21(SCL)
-// On an arduino LEONARDO:   2(SDA),  3(SCL), ...
-#define OLED_RESET     -1 // Reset pin # (or -1 if sharing Arduino reset pin)
-#define SCREEN_ADDRESS 0x3C ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
-
-// Layer led handling
-const int numberOfLayers = 3;
-char layerStrBuffer[20];
-int currentLayer = 0;
+// U8G2_SSD1306_128X64_NONAME_1_HW_I2C display(U8G2_R2, /* reset=*/ U8X8_PIN_NONE);
+#define I2C_ADDRESS 0x3C
+SSD1306AsciiAvrI2c display;
 
 // Rotary Encoder setup
 const int buttonPin = 7;
 const int encoderPin1 = 6;
 const int encoderPin2 = 5;
-EncoderButton eb1(encoderPin1, encoderPin2, buttonPin);
+EncoderButton encoderButton(encoderPin1, encoderPin2, buttonPin);
 
 // Keypad stuff
 const byte ROWS = 3; // 3 rows
@@ -40,71 +28,93 @@ char keys[ROWS][COLS] = {
 byte rowPins[ROWS] = {19, 18, 15}; //connect to the row pinouts of the keypad
 byte colPins[COLS] = {14, 16, 10}; //connect to the column pinouts of the keypad
 Keypad keypad = Keypad( makeKeymap(keys), colPins, rowPins, ROWS, COLS );
-unsigned long keyHeldTime[LIST_MAX]; // Keep a list of how long each key is held
 
-int mappedKeysXOffset = 12;
-int mappedKeysYOffset = 20;
-String mappedKeys[numberOfLayers][ROWS][COLS] = {
-  {{"F13","F14","F15"},
-  {"F16","F17","F18"},
-  {"F19","F20","F21"}},
-  {{"1","2","3"},
-  {"4","5","6"},
-  {"7","8","9"}},
-  {{"Q","W","E"},
-  {"A","S","D"},
-  {"Z","X","C"}}
-};
+// --- Global Objects ---
+Layer allLayers[NUM_LAYERS];
+ConfigManager configManager;
+Macropad macropad(allLayers, &keypad, &display);
+CommunicationManager communicationManager(allLayers, &configManager);
 
 bool hasSlept = false;
 
-bool invertOled = false;
-unsigned long invertOledTimestamp;
-unsigned long invertOledDuration = 300L * 1000;
-
 void setup() {
-  Serial.begin(9600); // Debug stuff
-
-  // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
-  if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
-    Serial.println(F("SSD1306 allocation failed"));
-    for(;;); // Don't proceed, loop forever
-  }
+  #ifdef ENABLE_SERIAL
+    Serial.begin(9600);
+    // Wait a moment for serial to connect if needed
+    while (!Serial); 
+  #endif
   
-  // Show initial display buffer contents on the screen --
-  // the library initializes this with an Adafruit splash screen.
-  display.display();
-  delay(1000); // Pause for 1 seconds'
+  #ifdef ENABLE_FREERAM_CHECK
+    Serial.print(F("Free SRAM: "));
+    Serial.println(freeMemory());
+  #endif
 
-  StartupAnimation();
+  // Start the U8g2 library. This also initializes the I2C communication.
+  display.begin(&Adafruit128x64, I2C_ADDRESS);
+  displayStart();
   
-  // Show the keymap on the oled display
-  ShowCurrentLayer();
-
   // Setup for encoder button
-  eb1.setEncoderHandler(onEb1Encoder);
-  eb1.setClickHandler(onEb1Click);
-  eb1.setLongPressHandler(onEb1LongClick);
+  encoderButton.setEncoderHandler(onEncoderEvent);
+  encoderButton.setClickHandler(onEncoderClick);
+  encoderButton.setLongPressHandler(onEncoderLongClick);
 
-  invertOledTimestamp = millis();
+  configManager.begin();
+  configManager.loadConfig(allLayers);
+  delay(1000);
+  
+  macropad.begin();
+  macropad.updateDisplay();
 
-  // Sends a clean report to the host. This is important on any Arduino type.
-  Keyboard.begin();
+  communicationManager.begin();
+
+  #ifdef ENABLE_FREERAM_CHECK
+    Serial.print(F("Free SRAM: "));
+    Serial.println(freeMemory());
+  #endif
+  
+  DEBUG_PRINTLN(F("Macropad Initialized"));
+  DEBUG_PRINTLN(F("Send 'd' to dump config"));
+  DEBUG_PRINTLN(F("Send 'p' to print layers"));
+  DEBUG_PRINTLN(F("Send 'r' for factory reset"));
+  DEBUG_PRINTLN(F("Send 'f' to check ram"));
 }
 
-void onEb1Click(EncoderButton& eb) {
-  Consumer.write(MEDIA_PLAY_PAUSE);
+void loop() {
+  if (USBDevice.isSuspended())
+  {
+    display.clear();
+    delay(500);
+
+    LowPower.idle(SLEEP_8S, ADC_OFF, TIMER4_OFF, TIMER3_OFF, TIMER1_OFF, TIMER0_OFF, SPI_OFF, USART1_OFF, TWI_OFF, USB_OFF);
+    hasSlept = true;
+  }
+
+  if (hasSlept && USBDevice.isSuspended() == false)
+  {
+    hasSlept = false;
+    macropad.updateDisplay();
+  }
+
+  macropad.update();
+  encoderButton.update();
+  communicationManager.update();
+
+  #ifdef ENABLE_SERIAL
+    handleSerialCommands();
+  #endif
 }
 
-void onEb1LongClick(EncoderButton& eb) {
-  currentLayer += 1;
-  if (currentLayer >= numberOfLayers)
-    currentLayer = 0;
+void displayStart()
+{
+  display.displayRemap(true); // Rotate display 180 deg
+  display.setCursor(30, 4);
+  display.print("Starting...");
 
-  ShowCurrentLayer();
+  // Add a delay so the screen doesn't refresh constantly in this example
+  delay(1000);
 }
 
-void onEb1Encoder(EncoderButton& eb) {
+void onEncoderEvent(EncoderButton& eb) {
   int incr = eb.increment();
   if (incr > 0)
   {
@@ -116,224 +126,61 @@ void onEb1Encoder(EncoderButton& eb) {
   }
 }
 
-void ShowCurrentLayer()
-{
-  sprintf(layerStrBuffer, "Layer: %d", currentLayer);
-
-  // Clear the buffer
-  display.clearDisplay();
-  display.setTextSize(1); //height=9 pixels, width=5 pixels at textsize 1
-  display.setRotation(2); //rotates text on OLED 1=90 degrees, 2=180 degrees
-
-  display.fillRect(0, 0, 128, 13, WHITE);
-  display.setCursor(5, 2);
-  display.setTextColor(BLACK);
-  display.print(layerStrBuffer);
-
-  display.setTextColor(WHITE);
-  
-  display.setCursor(mappedKeysXOffset, mappedKeysYOffset);
-  display.print(mappedKeys[currentLayer][0][0]);
-  display.setCursor(mappedKeysXOffset + 42, mappedKeysYOffset);
-  display.print(mappedKeys[currentLayer][0][1]);
-  display.setCursor(mappedKeysXOffset + 84, mappedKeysYOffset);
-  display.print(mappedKeys[currentLayer][0][2]);
-
-  display.setCursor(mappedKeysXOffset, mappedKeysYOffset + 16);
-  display.print(mappedKeys[currentLayer][1][0]);
-  display.setCursor(mappedKeysXOffset + 42, mappedKeysYOffset + 16);
-  display.print(mappedKeys[currentLayer][1][1]);
-  display.setCursor(mappedKeysXOffset + 84, mappedKeysYOffset + 16);
-  display.print(mappedKeys[currentLayer][1][2]);
-
-  display.setCursor(mappedKeysXOffset, mappedKeysYOffset + 32);
-  display.print(mappedKeys[currentLayer][2][0]);
-  display.setCursor(mappedKeysXOffset + 42, mappedKeysYOffset + 32);
-  display.print(mappedKeys[currentLayer][2][1]);
-  display.setCursor(mappedKeysXOffset + 84, mappedKeysYOffset + 32);
-  display.print(mappedKeys[currentLayer][2][2]);
-
-  // Invert display to prevent burn in
-  display.invertDisplay(invertOled);
-
-  display.display();
+void onEncoderClick(EncoderButton& eb) {
+  Consumer.write(MEDIA_PLAY_PAUSE);
 }
 
-void StartupAnimation() {
-  display.clearDisplay();
-
-  for(int16_t i=0; i<max(display.width(),display.height())/2; i+=2) {
-    display.drawCircle(display.width()/2, display.height()/2, i, SSD1306_WHITE);
-    display.display();
-    delay(1);
-  }
-
-  delay(500);
+void onEncoderLongClick(EncoderButton& eb) {
+  macropad.switchToNextLayer();
 }
 
-void loop() {
-  if (USBDevice.isSuspended())
-  {
-    display.clearDisplay();
-    display.display();
-    delay(500);
+#ifdef ENABLE_SERIAL
+  void handleSerialCommands() {
+    if (Serial.available() > 0) {
+      char command = Serial.read();
 
-    LowPower.idle(SLEEP_8S, ADC_OFF, TIMER4_OFF, TIMER3_OFF, TIMER1_OFF, TIMER0_OFF, SPI_OFF, USART1_OFF, TWI_OFF, USB_OFF);
-    hasSlept = true;
-  }
+      #ifdef ENABLE_FREERAM_CHECK
+        Serial.print(F("Free SRAM: "));
+        Serial.println(freeMemory());
+      #endif
+      
+      if (command == 'd') { // 'd' for Dump
+        const size_t configSize = sizeof(Layer) * NUM_LAYERS;
+        uint8_t serialBuffer[configSize];
+        size_t bytesWritten = configManager.serializeConfig(allLayers, serialBuffer, configSize);
 
-  if (hasSlept && USBDevice.isSuspended() == false)
-  {
-    hasSlept = false;
-    ShowCurrentLayer();
-  }
+        if (bytesWritten > 0) {
+          DEBUG_PRINTLN(F("--- BEGIN CONFIG DUMP ---"));
+          DEBUG_PRINT(F("Size of config: ")); DEBUG_PRINTLN(configSize);
+          for (size_t i = 0; i < bytesWritten; i++) {
+            if (serialBuffer[i] < 0x10) DEBUG_PRINT("0");
+            DEBUG_PRINT(serialBuffer[i], HEX);
+            DEBUG_PRINT(" ");
+          }
+          DEBUG_PRINTLN();
+          DEBUG_PRINTLN(F("--- END CONFIG DUMP ---"));
+        } else {
+          DEBUG_PRINTLN(F("Error: Serialization failed."));
+        }
+      }
 
-  // Call 'update' for every EncoderButton
-  eb1.update();
-
-  // Check if the display should be inverted (to prevent burn in)
-  if (millis() - invertOledTimestamp >= invertOledDuration)
-  {
-    invertOled = !invertOled;
-    invertOledTimestamp = millis();
-
-    ShowCurrentLayer();
-  }
-
-  // 'Update' the keypad (and check for pressed keys)
-  if (keypad.getKeys())
-  {
-    for (int i=0; i<LIST_MAX; i++)
-    {
-      if (keypad.key[i].stateChanged && keypad.key[i].kstate == PRESSED)
-      {
-        //Serial.println(keypad.key[i].kchar);
-        HandleSingleKey(keypad.key[i].kchar);
+      if (command == 'p') { // 'p' for print
+        for (int i = 0; i < NUM_LAYERS; i++) {
+          DEBUG_PRINT("Layer: "); DEBUG_PRINT(allLayers[i].name); DEBUG_PRINT(" - enabled: "); DEBUG_PRINTLN(allLayers[i].isEnabled);
+          for (int j = 0; j < NUM_BUTTONS; j++) {
+            DEBUG_PRINT("Button "); DEBUG_PRINT(j); DEBUG_PRINT(" - Key: "); DEBUG_PRINT(allLayers[i].actions[j].key); DEBUG_PRINT(" - Modifier: "); DEBUG_PRINT(allLayers[i].actions[j].modifier); DEBUG_PRINT(" - Text: "); DEBUG_PRINTLN(allLayers[i].actions[j].text);
+          }
+        }
+      }
+      
+      if (command == 'r') { // 'r' for Reset
+          DEBUG_PRINTLN(F("Performing factory reset..."));
+          configManager.factoryReset(allLayers);
+          configManager.saveConfig(allLayers);
+          delay(500);
+          macropad.updateDisplay();
+          DEBUG_PRINTLN(F("Reset complete"));
       }
     }
   }
-  // Check for held keys
-  for (int i=0; i<LIST_MAX; i++)
-  {
-    if (keypad.key[i].kstate == HOLD && (millis() - keyHeldTime[i]) > 100)
-    {
-      //Serial.print(keypad.key[i].kchar);
-      //Serial.println(" - held");
-      HandleSingleKey(keypad.key[i].kchar);
-      keyHeldTime[i] = millis();
-    }
-  }
-}
-
-void HandleSingleKey(char key)
-{
-  switch (currentLayer) {
-    case 0:
-      HandlerLayer0(key);
-      break;
-    case 1:
-      HandlerLayer1(key);
-      break;
-    case 2:
-      HandlerLayer2(key);
-      break;
-  }
-}
-
-void HandlerLayer0(char key)
-{
-  switch (key) {
-    case '1':
-      Keyboard.write(KEY_F13);
-      break;
-    case '2':
-      Keyboard.write(KEY_F14);
-      break;
-    case '3':
-      Keyboard.write(KEY_F15);
-      break;
-    case '4':
-      Keyboard.write(KEY_F16);
-      break;
-    case '5':
-      Keyboard.write(KEY_F17);
-      break;
-    case '6':
-      Keyboard.write(KEY_F18);
-      break;
-    case '7':
-      Keyboard.write(KEY_F19);
-      break;
-    case '8':
-      Keyboard.write(KEY_F20);
-      break;
-    case '9':
-      Keyboard.write(KEY_F21);
-      break;
-  }
-}
-
-void HandlerLayer1(char key)
-{
-  switch (key) {
-    case '1':
-      Keyboard.write('1');
-      break;
-    case '2':
-      Keyboard.write('2');
-      break;
-    case '3':
-      Keyboard.write('3');
-      break;
-    case '4':
-      Keyboard.write('4');
-      break;
-    case '5':
-      Keyboard.write('5');
-      break;
-    case '6':
-      Keyboard.write('6');
-      break;
-    case '7':
-      Keyboard.write('7');
-      break;
-    case '8':
-      Keyboard.write('8');
-      break;
-    case '9':
-      Keyboard.write('9');
-      break;
-  }
-}
-
-void HandlerLayer2(char key) {
-  switch (key) {
-    case '1':
-      Keyboard.write('q');
-      break;
-    case '2':
-      Keyboard.write('w');
-      break;
-    case '3':
-      Keyboard.write('e');
-      break;
-    case '4':
-      Keyboard.write('a');
-      break;
-    case '5':
-      Keyboard.write('s');
-      break;
-    case '6':
-      Keyboard.write('d');
-      break;
-    case '7':
-      Keyboard.write('z');
-      break;
-    case '8':
-      Keyboard.write('x');
-      break;
-    case '9':
-      Keyboard.write('c');
-      break;
-  }
-}
+#endif
