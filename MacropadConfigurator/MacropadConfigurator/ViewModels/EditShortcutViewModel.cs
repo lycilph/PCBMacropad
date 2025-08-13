@@ -11,7 +11,7 @@ namespace MacropadConfigurator.ViewModels;
 
 public partial class EditShortcutViewModel : ObservableObject
 {
-    private readonly ApplicationService applicationService;
+    private readonly ConfigurationService configurationService;
     private readonly ScriptService scriptService;
 
     private Shortcut? shortcut;
@@ -37,9 +37,9 @@ public partial class EditShortcutViewModel : ObservableObject
     [ObservableProperty]
     private string output = string.Empty;
 
-    public EditShortcutViewModel(ApplicationService applicationService, ScriptService scriptService)
+    public EditShortcutViewModel(ConfigurationService configurationService, ScriptService scriptService)
     {
-        this.applicationService = applicationService;
+        this.configurationService = configurationService;
         this.scriptService = scriptService;
     }
 
@@ -58,21 +58,17 @@ public partial class EditShortcutViewModel : ObservableObject
     [RelayCommand]
     private async Task CompileAsync()
     {
-        //var result = await scriptService.CompileAsync(Document.Text);
-        //Output = result.Success ? "Success" : result.Message;
-
-        var ms = applicationService.Configuration.MasterScript;
-        if (ms.MasterScriptState != null)
-            await scriptService.RunAsync(Document.Text, ms.MasterScriptState);
+        var result = await scriptService.CompileAsync(configurationService.Current.MasterScript.Script, Document.Text);
+        Output = result.Success ? "Success" : result.Message;
     }
 
     [RelayCommand]
     private async Task SaveAsync()
     {
         if (shortcut == null) return;
-        
+
         var parsed_key = KeyParser.StringToKey(Key);
-        var result = await scriptService.CompileAsync(Document.Text);
+        var result = await scriptService.CompileAsync(configurationService.Current.MasterScript.Script, Document.Text);
 
         if (Key != System.Windows.Input.Key.None.ToString() && parsed_key == System.Windows.Input.Key.None)
         {
@@ -93,7 +89,6 @@ public partial class EditShortcutViewModel : ObservableObject
                                  (Alt ? ModifierKeys.Alt : ModifierKeys.None);
 
             shortcut.Script = Document.Text;
-            shortcut.CompiledScript = result.Script;
 
             shortcut = null;
             Output = string.Empty;

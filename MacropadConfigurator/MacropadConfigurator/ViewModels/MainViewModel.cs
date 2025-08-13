@@ -23,11 +23,11 @@ public partial class MainViewModel : ObservableRecipient, IRecipient<LogMessage>
     [ObservableProperty]
     private ObservableCollection<string> log = [];
 
-    public MainViewModel(ApplicationService applicationService, ScriptService scriptService)
+    public MainViewModel(ConfigurationService configurationService, ScriptService scriptService)
     {
         this.scriptService = scriptService;
 
-        Layers = applicationService.Configuration.Layers;
+        Layers = configurationService.Current.Layers;
         selectedLayer = Layers.First();
 
         IsActive = true;
@@ -52,9 +52,9 @@ public partial class MainViewModel : ObservableRecipient, IRecipient<LogMessage>
     }
 
     [RelayCommand]
-    private void ExecuteShortcut(Shortcut shortcut)
+    private async Task ExecuteShortcutAsync(Shortcut shortcut)
     {
         WeakReferenceMessenger.Default.Send(new LogMessage($"Executing script for shortcut [{shortcut.Text}]"));
-        scriptService.ExecuteScriptAsync(shortcut.CompiledScript);
+        await scriptService.RunAsync(shortcut.Script);
     }
 }

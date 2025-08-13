@@ -25,6 +25,7 @@ public partial class ShellViewModel
     private readonly EditMasterScriptViewModel editMasterScriptViewModel;
 
     private readonly ApplicationService applicationService;
+    private readonly ConfigurationService configurationService;
     private readonly SettingsService settingsService;
     private readonly OverlayService overlayService;
     private readonly CommunicationService communicationService;
@@ -45,6 +46,7 @@ public partial class ShellViewModel
                           EditMasterScriptViewModel editMasterScriptViewModel,
                           SettingsViewModel settingsViewModel,
                           ApplicationService applicationService,
+                          ConfigurationService configurationService,
                           SettingsService settingsService,
                           OverlayService overlayService,
                           CommunicationService communicationService,
@@ -55,6 +57,7 @@ public partial class ShellViewModel
         this.editMasterScriptViewModel = editMasterScriptViewModel;
 
         this.applicationService = applicationService;
+        this.configurationService = configurationService;
         this.settingsService = settingsService;
         this.overlayService = overlayService;
         this.communicationService = communicationService;
@@ -82,7 +85,7 @@ public partial class ShellViewModel
         {
             overlayService.HideSpinner();
             WeakReferenceMessenger.Default.Send(new LogMessage("Configuration loaded"));
-            applicationService.Configuration.Update(config);
+            configurationService.Current.Update(config);
         });
     }
 
@@ -92,7 +95,7 @@ public partial class ShellViewModel
         WeakReferenceMessenger.Default.Send(new LogMessage("Application is ready"));
 
         overlayService.ShowSpinner();
-        await applicationService.InitializeScriptsAsync();
+        await applicationService.InitializeScriptStateAsync();
         overlayService.HideSpinner();
     }
 
@@ -162,7 +165,7 @@ public partial class ShellViewModel
 
         if (result)
         {
-            var config = applicationService.Configuration.ToDto();
+            var config = configurationService.Current.ToDto();
             await Task.Run(() => communicationService.SaveConfiguration(config));
             WeakReferenceMessenger.Default.Send(new LogMessage("Configuration uploaded successfully"));
         }

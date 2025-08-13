@@ -9,7 +9,7 @@ namespace MacropadConfigurator.ViewModels;
 
 public partial class EditMasterScriptViewModel : ObservableObject
 {
-    private readonly ApplicationService applicationService;
+    private readonly ConfigurationService configurationService;
     private readonly ScriptService scriptService;
 
     [ObservableProperty]
@@ -18,15 +18,15 @@ public partial class EditMasterScriptViewModel : ObservableObject
     [ObservableProperty]
     private string output = string.Empty;
 
-    public EditMasterScriptViewModel(ApplicationService applicationService, ScriptService scriptService)
+    public EditMasterScriptViewModel(ConfigurationService configurationService, ScriptService scriptService)
     {
-        this.applicationService = applicationService;
+        this.configurationService = configurationService;
         this.scriptService = scriptService;
     }
 
     public void Activate()
     {
-        Document = new TextDocument(applicationService.Configuration.MasterScript.Script);
+        Document = new TextDocument(configurationService.Current.MasterScript.Script);
     }
 
     [RelayCommand]
@@ -44,16 +44,15 @@ public partial class EditMasterScriptViewModel : ObservableObject
         if (!string.IsNullOrWhiteSpace(Document.Text) && !result.Success)
         {
             // Error in parsing script
-            
+
             Output = result.Message;
         }
         else
         {
             // Script compiled successfully
 
-            var ms = applicationService.Configuration.MasterScript;
-            ms.Script = Document.Text;
-            ms.CompiledScript = result.Script;
+            configurationService.Current.MasterScript.Script = Document.Text;
+            await scriptService.UpdateStateAsync(configurationService.Current.MasterScript.Script);
 
             Output = string.Empty;
             WeakReferenceMessenger.Default.Send(new NavigateToMainMessage());

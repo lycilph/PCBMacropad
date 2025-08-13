@@ -40,6 +40,7 @@ public partial class App : Application
         services.AddSingleton<SettingsService>();
         services.AddSingleton<CommunicationService>();
         services.AddSingleton<ScriptService>();
+        services.AddSingleton<ConfigurationService>();
 
         // Register view models
         services.AddTransient<ShellViewModel>();

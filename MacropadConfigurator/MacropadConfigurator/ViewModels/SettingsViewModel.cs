@@ -14,7 +14,7 @@ public partial class SettingsViewModel : ObservableObject
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
     
-    private readonly ApplicationService application_service;
+    private readonly ConfigurationService configuration_service;
     private readonly SettingsService settings_service;
 
     [ObservableProperty]
@@ -54,9 +54,9 @@ public partial class SettingsViewModel : ObservableObject
         }
     }
 
-    public SettingsViewModel(ApplicationService application_service, SettingsService settings_service)
+    public SettingsViewModel(ConfigurationService configuration_service, SettingsService settings_service)
     {
-        this.application_service = application_service;
+        this.configuration_service = configuration_service;
         this.settings_service = settings_service;
 
         ApplicationColors = settings_service.Themes.ToObservableCollection();
@@ -76,7 +76,7 @@ public partial class SettingsViewModel : ObservableObject
     public void ResetConfiguration()
     {
         logger.Info("Resetting configuration");
-        application_service.Configuration.Reset();
+        configuration_service.Current.Reset();
     }
 
     [RelayCommand]

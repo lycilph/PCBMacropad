@@ -7,16 +7,6 @@ public class Configuration
     public MasterScript MasterScript { get; set; } = new MasterScript();
     public List<Layer> Layers { get; set; } = [];
 
-    public void CreateDefaultLayers()
-    {
-        Layers =
-        [
-            new Layer { Name = "Layer 1" },
-            new Layer { Name = "Layer 2" },
-            new Layer { Name = "Layer 3" }
-        ];
-    }
-
     public void Update(MacropadConfigurationDTO dto)
     {
         for (int i = 0; i < Layers.Count; i++)

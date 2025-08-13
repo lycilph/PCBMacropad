@@ -1,10 +1,8 @@
 ﻿using System.Diagnostics;
-using System.Text.Json.Serialization;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MacropadConfigurator.DTO;
 using MacropadConfigurator.Services;
-using Microsoft.CodeAnalysis.Scripting;
 
 namespace MacropadConfigurator.Models;
 
@@ -22,9 +20,6 @@ public partial class Shortcut : ObservableObject
 
     [ObservableProperty]
     public string script = string.Empty;
-
-    [JsonIgnore]
-    public Script<object>? CompiledScript { get; set; } = null;
 
     public void Update(MacropadButtonDTO dto)
     {
@@ -49,6 +44,5 @@ public partial class Shortcut : ObservableObject
         Key = Key.None;
         Modifiers = ModifierKeys.None;
         Script = string.Empty;
-        CompiledScript = null;
     }
 }

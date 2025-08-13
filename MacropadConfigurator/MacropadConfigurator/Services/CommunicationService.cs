@@ -236,7 +236,9 @@ public class CommunicationService
         int size = Marshal.SizeOf(obj);
         byte[] arr = new byte[size];
         IntPtr ptr = Marshal.AllocHGlobal(size);
+#pragma warning disable CS8607 // A possible null value may not be used for a type marked with [NotNull] or [DisallowNull]
         Marshal.StructureToPtr(obj, ptr, true);
+#pragma warning restore CS8607 // A possible null value may not be used for a type marked with [NotNull] or [DisallowNull]
         Marshal.Copy(ptr, arr, 0, size);
         Marshal.FreeHGlobal(ptr);
         return arr;
@@ -248,7 +250,9 @@ public class CommunicationService
         int size = Marshal.SizeOf(obj);
         IntPtr ptr = Marshal.AllocHGlobal(size);
         Marshal.Copy(arr, 0, ptr, size);
+#pragma warning disable CS8605 // Unboxing a possibly null value.
         obj = (T)Marshal.PtrToStructure(ptr, obj.GetType());
+#pragma warning restore CS8605 // Unboxing a possibly null value.
         Marshal.FreeHGlobal(ptr);
         return obj;
     }
