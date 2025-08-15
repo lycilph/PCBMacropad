@@ -61,9 +61,11 @@
                   Padding="10">
             <StackPanel>
                 <mah:ToggleSwitch IsOn="{Binding HideOnClose}"
-                                  Content="Hide on close"/>
+                                  OnContent="Hides on close"
+                                  OffContent="Exits on close"/>
                 <mah:ToggleSwitch IsOn="{Binding RunOnStartup}"
-                                  Content="Run on startup"
+                                  OnContent="Runs on startup"
+                                  OffContent="Manual launch"
                                   Margin="0 5 0 0"/>
             </StackPanel>
         </GroupBox>

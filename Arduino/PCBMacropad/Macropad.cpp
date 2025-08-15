@@ -16,8 +16,8 @@ void Macropad::begin() {
 }
 
 void Macropad::updateDisplay() {
-  display->invertDisplay(invertOled);
   display->clear();
+  display->invertDisplay(invertOled);
 
   display->setFont(Verdana12);
   display->print(F("Layer: ")); display->println(layers[currentLayer].name);

@@ -63,7 +63,6 @@ void setup() {
   delay(1000);
   
   macropad.begin();
-  macropad.updateDisplay();
 
   communicationManager.begin();
 

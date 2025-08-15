@@ -1,6 +1,8 @@
 ﻿using System.IO;
 using System.Text.Json;
+using CommunityToolkit.Mvvm.Messaging;
 using ControlzEx.Theming;
+using MacropadConfigurator.Messages;
 using MacropadConfigurator.Models;
 using NLog;
 
@@ -17,7 +19,20 @@ public class SettingsService
     public List<Theme> Themes { get; private set; } = [];
 
     public bool HideOnClose { get; set; } = false;
-    public bool RunOnStartup { get; set; } = false;
+
+    private bool runOnStartup = false;
+    public bool RunOnStartup 
+    { 
+        get => runOnStartup; 
+        set
+        {
+            if (runOnStartup != value)
+            {
+                runOnStartup = value;
+                HandleRunOnStartupChanged();
+            }
+        }
+    }
 
     public SettingsService()
     {
@@ -39,6 +54,11 @@ public class SettingsService
     public void SetColorScheme(string color_scheme)
     {
         ThemeManager.Current.ChangeThemeColorScheme(App.Current, color_scheme);
+    }
+
+    private void HandleRunOnStartupChanged()
+    {
+        WeakReferenceMessenger.Default.Send(new StartupMessage(RunOnStartup));
     }
 
     public void Load(string path)

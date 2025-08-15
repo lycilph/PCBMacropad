@@ -31,6 +31,6 @@ private:
   // Display invert color timer
   bool invertOled = false;
   unsigned long invertOledTimestamp;
-  const unsigned long invertOledDuration = 5 * 60 * 1000; // Should work out to 5 min :-)
-  //const unsigned long invertOledDuration = 10 * 1000; // debug - invert every 10 sec
+  const unsigned long invertOledDuration = 5 * 60 * 1000UL; // Should work out to 5 min :-)
+  //const unsigned long invertOledDuration = 5 * 1000UL; // debug - invert every 5 sec
 };

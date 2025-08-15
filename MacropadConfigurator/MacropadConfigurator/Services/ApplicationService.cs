@@ -1,14 +1,18 @@
-﻿using System.IO;
-using MacropadConfigurator.Models;
+﻿using System.Diagnostics;
+using System.IO;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
+using MacropadConfigurator.Messages;
 using NLog;
 
 namespace MacropadConfigurator.Services;
 
-public class ApplicationService
+public class ApplicationService : ObservableRecipient, IRecipient<StartupMessage>
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
     private readonly string folderName = "MacropadConfigurator";
+    private readonly string applicationLink = "MacropadConfigurator.lnk";
     private readonly string settingsFile = "settings.json";
     private readonly string shortcutsFile = "shortcuts.json";
 
@@ -25,6 +29,8 @@ public class ApplicationService
         this.configurationService = configurationService;
 
         keyboardHook = new KeyboardHook();
+
+        IsActive = true;
     }
 
     public string GetPath(string filename)
@@ -67,7 +73,6 @@ public class ApplicationService
         keyboardHook.Dispose();
     }
 
-
     private void KeyboardHook_ShortcutPressed(System.Windows.Input.Key arg1, System.Windows.Input.ModifierKeys arg2)
     {
         configurationService.Current.Layers
@@ -80,5 +85,45 @@ public class ApplicationService
                 logger.Trace($"[{arg1} - {arg2}] was pressed - Triggering shortcut [{s.Text}]");
                 await scriptService.RunAsync(s.Script);
             });
+    }
+
+    public void Receive(StartupMessage message)
+    {
+        if (message.RunOnStartup)
+            CreateShortcut();
+        else
+            RemoveShortcut();
+    }
+
+    private void CreateShortcut()
+    {
+        var startupFolder = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
+        var shortcutPath = Path.Combine(startupFolder, "MacropadConfigurator.lnk");
+        var exePath = Process.GetCurrentProcess()?.MainModule?.FileName;
+
+        if (File.Exists(shortcutPath)) return;
+
+        var shell_type = Type.GetTypeFromProgID("WScript.Shell");
+        if (shell_type != null)
+        {
+            dynamic? shell = Activator.CreateInstance(shell_type);
+            if (shell != null)
+            {
+                var shortcut = shell.CreateShortcut(shortcutPath);
+                shortcut.TargetPath = exePath;
+                shortcut.WorkingDirectory = Path.GetDirectoryName(exePath);
+                shortcut.Description = "Launches Macropad Configurator on startup";
+                shortcut.Save();
+            }
+        }
+    }
+
+    private void RemoveShortcut()
+    {
+        var startupFolder = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
+        var shortcutPath = Path.Combine(startupFolder, "MacropadConfigurator.lnk");
+
+        if (File.Exists(shortcutPath))
+            File.Delete(shortcutPath);
     }
 }
