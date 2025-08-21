@@ -42,6 +42,13 @@ public class ScriptHost(App app)
         return Process.Start(path);
     }
 
+    public bool WindowExist(string path)
+    {
+        var filename = Path.GetFileNameWithoutExtension(path);
+        var hWnd = WindowApiHelper.FindWindowByProcessName(filename);
+        return hWnd != IntPtr.Zero;
+    }
+
     public void MoveWindow(string path, int x, int y, int width, int height)
     {
         var filename = Path.GetFileNameWithoutExtension(path);
@@ -65,4 +72,6 @@ public class ScriptHost(App app)
             WindowApiHelper.MoveWindow(hWnd, x, y, width, height, true);
         }
     }
+
+    public void Sleep(int milliseconds) => Thread.Sleep(milliseconds);
 }
