@@ -107,9 +107,8 @@ void displayStart()
 {
   display.displayRemap(true); // Rotate display 180 deg
   display.setCursor(30, 4);
+  display.setFont(Adafruit5x7);
   display.print("Starting...");
-
-  // Add a delay so the screen doesn't refresh constantly in this example
   delay(1000);
 }
 
