@@ -29,62 +29,6 @@ public class ScriptService
                     "System.Windows"
                  );
     }
-
-    //public async void ExecuteScriptAsync(Script<object>? script)
-    //{
-    //    // Ensure we have a compiled script to run
-    //    if (script == null)
-    //    {
-    //        logger.Warn("Couldn't execute null script");
-    //        return;
-    //    }
-
-    //    try
-    //    {
-    //        await script.RunAsync(globals: host);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        MessageBox.Show($"An error occurred while running the script [{ex.Message}]",
-    //                        "Script Runtime Error",
-    //                        MessageBoxButton.OK,
-    //                        MessageBoxImage.Error);
-    //    }
-    //}
-
-    //public async Task<ScriptState<object>> RunAsync(string script)
-    //{
-    //    var options = ScriptOptions.Default
-    //            .AddReferences(
-    //                typeof(Process).Assembly,
-    //                typeof(MessageBox).Assembly,
-    //                typeof(ScriptHost).Assembly
-    //            )
-    //            .AddImports(
-    //                "System",
-    //                "System.Diagnostics",
-    //                "System.Windows"
-    //             );
-
-    //    return await CSharpScript.RunAsync(script, options, host, globalsType: typeof(ScriptHost));
-    //}
-
-    //public async Task<ScriptState<object>> RunAsync(string script, ScriptState<object> state)
-    //{
-    //    var options = ScriptOptions.Default
-    //            .AddReferences(
-    //                typeof(Process).Assembly,
-    //                typeof(MessageBox).Assembly,
-    //                typeof(ScriptHost).Assembly
-    //            )
-    //            .AddImports(
-    //                "System",
-    //                "System.Diagnostics",
-    //                "System.Windows"
-    //             );
-
-    //    return await state.ContinueWithAsync(script, options);
-    //}
     
     public async Task RunAsync(string script)
     {

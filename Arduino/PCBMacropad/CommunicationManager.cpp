@@ -1,3 +1,5 @@
+#include <avr/wdt.h>
+
 #include "CommunicationManager.h"
 #include "config.h"
 
@@ -111,6 +113,8 @@ void CommunicationManager::handleConfigData() {
     bytesReceived = 0;
     totalDataSize = 0;
     DEBUG_PRINTLN("\nWaiting for next command.");
+
+    resetArduino();
   }
 }
 
@@ -118,4 +122,12 @@ void CommunicationManager::handleResetConfig() {
   configManager->factoryReset(layers);
   configManager->saveConfig(layers);
   delay(1000);
+
+  resetArduino();
+}
+
+void CommunicationManager::resetArduino() {
+  wdt_disable();
+  wdt_enable(WDTO_15MS);
+  while (1) {}
 }

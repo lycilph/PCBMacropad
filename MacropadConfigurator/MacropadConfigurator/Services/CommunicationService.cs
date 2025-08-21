@@ -201,8 +201,6 @@ public class CommunicationService
 
     public void ResetConfiguration()
     {
-        
-
         if (device == null)
         {
             logger.Error("Cannot load configuration: No device found");

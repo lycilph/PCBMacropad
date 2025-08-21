@@ -32,6 +32,8 @@ private:
   void handleConfigData();
   void handleResetConfig();
 
+  void resetArduino();
+
   Layer* layers;
   ConfigManager* configManager;
 
