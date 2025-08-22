@@ -55,6 +55,8 @@ public partial class EditMasterScriptViewModel : ObservableObject
             await scriptService.UpdateStateAsync(configurationService.Current.MasterScript.Script);
 
             Output = string.Empty;
+
+            WeakReferenceMessenger.Default.Send(new DataChangedMessage());
             WeakReferenceMessenger.Default.Send(new NavigateToMainMessage());
         }
     }

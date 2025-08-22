@@ -93,6 +93,7 @@ public partial class EditShortcutViewModel : ObservableObject
             shortcut = null;
             Output = string.Empty;
 
+            WeakReferenceMessenger.Default.Send(new DataChangedMessage());
             WeakReferenceMessenger.Default.Send(new NavigateToMainMessage());
         }
     }

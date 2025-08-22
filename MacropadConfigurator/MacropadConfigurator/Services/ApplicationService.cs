@@ -7,7 +7,7 @@ using NLog;
 
 namespace MacropadConfigurator.Services;
 
-public class ApplicationService : ObservableRecipient, IRecipient<StartupMessage>
+public class ApplicationService : ObservableRecipient, IRecipient<StartupMessage>, IRecipient<DataChangedMessage>
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
@@ -22,7 +22,9 @@ public class ApplicationService : ObservableRecipient, IRecipient<StartupMessage
 
     private readonly KeyboardHook keyboardHook;
 
-    public ApplicationService(SettingsService settingsService, ScriptService scriptService, ConfigurationService configurationService)
+    public ApplicationService(SettingsService settingsService,
+                              ScriptService scriptService,
+                              ConfigurationService configurationService)
     {
         this.settingsService = settingsService;
         this.scriptService = scriptService;
@@ -66,11 +68,16 @@ public class ApplicationService : ObservableRecipient, IRecipient<StartupMessage
 
     public void Stop()
     {
-        settingsService.Save(GetPath(settingsFile));
-        configurationService.Save(GetPath(shortcutsFile));
+        SaveData();
 
         keyboardHook.ShortcutPressed -= KeyboardHook_ShortcutPressed;
         keyboardHook.Dispose();
+    }
+
+    private void SaveData()
+    {
+        settingsService.Save(GetPath(settingsFile));
+        configurationService.Save(GetPath(shortcutsFile));
     }
 
     private void KeyboardHook_ShortcutPressed(System.Windows.Input.Key arg1, System.Windows.Input.ModifierKeys arg2)
@@ -93,6 +100,11 @@ public class ApplicationService : ObservableRecipient, IRecipient<StartupMessage
             CreateShortcut();
         else
             RemoveShortcut();
+    }
+
+    public void Receive(DataChangedMessage message)
+    {
+        SaveData();
     }
 
     private void CreateShortcut()
