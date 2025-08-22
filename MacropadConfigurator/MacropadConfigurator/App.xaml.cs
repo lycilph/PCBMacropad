@@ -1,4 +1,5 @@
 ﻿using Hardcodet.Wpf.TaskbarNotification;
+using MacropadConfigurator.Misc;
 using MacropadConfigurator.Services;
 using MacropadConfigurator.ViewModels;
 using MacropadConfigurator.Views;
@@ -72,7 +73,9 @@ public partial class App : Application
         var vm = Services.GetRequiredService<ShellViewModel>();
         window = new ShellWindow { DataContext = vm };
 
-        ShowWindow();
+        // Check if this is started automatically (and if show start minimized)
+        var settings = Services.GetRequiredService<SettingsService>();
+        ShowWindow(settings.RunOnStartup && !DebugHelper.IsDebug());
     }
 
     private void ApplicationExit(object sender, ExitEventArgs e)
@@ -87,10 +90,17 @@ public partial class App : Application
 #pragma warning restore CA1416 // Validate platform compatibility
     }
 
-    public void ShowWindow()
+    public void ShowWindow(bool show_minimized = false)
     {
-        window.Show();
-        window.Activate();
+        if (show_minimized)
+        {
+            window.Hide();
+        }
+        else
+        {
+            window.Show();
+            window.Activate();
+        }
     }
 
     private void CheckForSingleInstance()

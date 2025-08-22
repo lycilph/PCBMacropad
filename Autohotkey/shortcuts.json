@@ -1,0 +1,187 @@
+{
+  "MasterScript": {
+    "Script": "int master_script_version = 1;\r\n\r\npublic bool IsWorkLocation() =\u003E GetMonitorCount() == 3;\r\n\r\n// Moving a window to an 2nd screen and resizing needs to be done in 2 steps (for some reason)\r\nvoid MoveAndPlace(string path, int x, int y, int w, int h, int delay)\r\n{\r\n\tMoveWindow(path,x,y);\r\n\tSleep(delay);\r\n\tMoveWindow(path,x,y,w,h);\r\n}"
+  },
+  "Layers": [
+    {
+      "Shortcuts": [
+        {
+          "Text": "Open",
+          "Key": 102,
+          "Modifiers": 0,
+          "Script": "Run(\u0022ms-teams.exe\u0022);\r\nRun(@\u0022C:\\Program Files\\Microsoft Office\\root\\Office16\\outlook.exe\u0022);\r\nRun(@\u0022C:\\Program Files\\Microsoft Office\\root\\Office16\\onenote.exe\u0022);\r\nRun(@\u0022C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge\u0022);\r\nRun(@\u0022C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe\u0022);"
+        },
+        {
+          "Text": "Place",
+          "Key": 103,
+          "Modifiers": 0,
+          "Script": "var chrome = @\u0022C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe\u0022;\r\nvar edge = @\u0022C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe\u0022;\r\nvar teams = \u0022ms-teams.exe\u0022;\r\nvar outlook = @\u0022C:\\Program Files\\Microsoft Office\\root\\Office16\\outlook.exe\u0022;\r\nvar onenote = @\u0022C:\\Program Files\\Microsoft Office\\root\\Office16\\onenote.exe\u0022;\r\n\r\nif (IsWorkLocation())\r\n{\r\n\tMoveAndPlace(chrome, 50, 30, 1600, 950, 500);\r\n\tMoveAndPlace(edge, 20, 75, 1600, 950, 500);\r\n\tMoveAndPlace(teams, -2300, 10, 1450, 960, 500);\r\n\tMoveAndPlace(outlook, 1920, 10, 1500, 1000, 500);\r\n\tMoveAndPlace(onenote, 2450, 125, 1300, 900, 500);\r\n}\r\nelse\r\n{\r\n\tMoveAndPlace(chrome, 50, 180, 1800, 1200, 500);\r\n\tMoveAndPlace(edge, 120, 100, 1800, 1200, 500);\r\n\tMoveAndPlace(teams, -2300, 10, 1450, 960, 500);\r\n\tMoveAndPlace(outlook, 1700, 50, 1700, 1200, 500);\r\n\tMoveAndPlace(onenote, 2000, 450, 1300, 900, 500);\r\n}"
+        },
+        {
+          "Text": "UI",
+          "Key": 104,
+          "Modifiers": 0,
+          "Script": "ToggleApplicationWindow();"
+        },
+        {
+          "Text": "Tidal",
+          "Key": 105,
+          "Modifiers": 0,
+          "Script": "var path = @\u0022C:\\Users\\Morten Lang\\AppData\\Local\\TIDAL\\TIDAL.exe\u0022;\r\n\r\nif (WindowExist(path))\r\n{\r\n\tMoveAndPlace(path, -2200, 190, 1300, 820, 500);\r\n}\r\nelse\r\n{\r\n\tRun(path);\r\n}"
+        },
+        {
+          "Text": "Notep",
+          "Key": 106,
+          "Modifiers": 0,
+          "Script": "Run(@\u0022C:\\Program Files\\Notepad\u002B\u002B\\notepad\u002B\u002B.exe\u0022);\r\n"
+        },
+        {
+          "Text": "Calc",
+          "Key": 107,
+          "Modifiers": 0,
+          "Script": "Run(\u0022calc\u0022);\r\n"
+        },
+        {
+          "Text": "T.Mgr",
+          "Key": 13,
+          "Modifiers": 6,
+          "Script": ""
+        },
+        {
+          "Text": "CSA\u002BX",
+          "Key": 67,
+          "Modifiers": 7,
+          "Script": ""
+        },
+        {
+          "Text": "Test",
+          "Key": 110,
+          "Modifiers": 0,
+          "Script": "ShowMessageBox($\u0022Master script version: {master_script_version\u002B\u002B}\u0022);"
+        }
+      ],
+      "Name": "Workflow",
+      "IsEnabled": true
+    },
+    {
+      "Shortcuts": [
+        {
+          "Text": "Copy",
+          "Key": 46,
+          "Modifiers": 2,
+          "Script": ""
+        },
+        {
+          "Text": "Paste",
+          "Key": 65,
+          "Modifiers": 2,
+          "Script": ""
+        },
+        {
+          "Text": "Cut",
+          "Key": 67,
+          "Modifiers": 2,
+          "Script": ""
+        },
+        {
+          "Text": "Undo",
+          "Key": 69,
+          "Modifiers": 2,
+          "Script": ""
+        },
+        {
+          "Text": "Redo",
+          "Key": 68,
+          "Modifiers": 2,
+          "Script": ""
+        },
+        {
+          "Text": "Save",
+          "Key": 62,
+          "Modifiers": 4,
+          "Script": ""
+        },
+        {
+          "Text": "Del.",
+          "Key": 32,
+          "Modifiers": 0,
+          "Script": ""
+        },
+        {
+          "Text": "Enter",
+          "Key": 6,
+          "Modifiers": 0,
+          "Script": ""
+        },
+        {
+          "Text": "Esc",
+          "Key": 13,
+          "Modifiers": 0,
+          "Script": ""
+        }
+      ],
+      "Name": "Shortcuts",
+      "IsEnabled": true
+    },
+    {
+      "Shortcuts": [
+        {
+          "Text": "Q",
+          "Key": 60,
+          "Modifiers": 0,
+          "Script": ""
+        },
+        {
+          "Text": "W",
+          "Key": 66,
+          "Modifiers": 0,
+          "Script": ""
+        },
+        {
+          "Text": "E",
+          "Key": 48,
+          "Modifiers": 0,
+          "Script": ""
+        },
+        {
+          "Text": "A",
+          "Key": 44,
+          "Modifiers": 0,
+          "Script": ""
+        },
+        {
+          "Text": "S",
+          "Key": 62,
+          "Modifiers": 0,
+          "Script": ""
+        },
+        {
+          "Text": "D",
+          "Key": 47,
+          "Modifiers": 0,
+          "Script": ""
+        },
+        {
+          "Text": "Z",
+          "Key": 69,
+          "Modifiers": 0,
+          "Script": ""
+        },
+        {
+          "Text": "X",
+          "Key": 67,
+          "Modifiers": 0,
+          "Script": ""
+        },
+        {
+          "Text": "C",
+          "Key": 46,
+          "Modifiers": 0,
+          "Script": ""
+        }
+      ],
+      "Name": "Misc",
+      "IsEnabled": false
+    }
+  ]
+}
