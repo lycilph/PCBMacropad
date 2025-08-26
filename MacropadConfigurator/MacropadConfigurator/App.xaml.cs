@@ -92,15 +92,12 @@ public partial class App : Application
 
     public void ShowWindow(bool show_minimized = false)
     {
+        window.Show();
+
         if (show_minimized)
-        {
             window.Hide();
-        }
         else
-        {
-            window.Show();
             window.Activate();
-        }
     }
 
     private void CheckForSingleInstance()

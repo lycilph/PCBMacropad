@@ -32,7 +32,15 @@ public class ScriptService
     
     public async Task RunAsync(string script)
     {
-        state = await state.ContinueWithAsync(script);
+        try
+        {
+            state = await state.ContinueWithAsync(script);
+        }
+        catch (Exception e)
+        {
+            MessageBox.Show($"Error while executing script {script}: {e.Message}");
+            throw;
+        }
     }
 
     public async Task UpdateStateAsync(string script)
