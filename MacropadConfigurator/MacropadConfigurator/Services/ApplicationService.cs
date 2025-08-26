@@ -85,7 +85,7 @@ public class ApplicationService : ObservableRecipient, IRecipient<StartupMessage
         configurationService.Current.Layers
             .Where(l => l.IsEnabled)
             .SelectMany(l => l.Shortcuts)
-            .Where(s => s.Key == arg1 && s.Modifiers == arg2)
+            .Where(s => s.Key == arg1 && s.Modifiers == arg2 & !string.IsNullOrEmpty(s.Script))
             .ToList()
             .ForEach(async s =>
             {

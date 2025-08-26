@@ -19,7 +19,7 @@ public partial class App : Application
     private TaskbarIcon notifyIcon = null!;
     private ShellWindow window = null!;
 
-    private Mutex singleInstanceMutex;
+    private static Mutex? singleInstanceMutex;
 
     public App()
     {
@@ -106,10 +106,10 @@ public partial class App : Application
     private void CheckForSingleInstance()
     {
         var isNewInstance = false;
-        singleInstanceMutex = new Mutex(true, "MacropadConfigurator", out isNewInstance);
+        singleInstanceMutex = new Mutex(true, @"Global\MacropadConfigurator", out isNewInstance);
         if (!isNewInstance)
         {
-            logger.Info("Second instance detected, shutting down");
+            MessageBox.Show("Second instance detected, shutting down");
             Current.Shutdown();
         }
     }

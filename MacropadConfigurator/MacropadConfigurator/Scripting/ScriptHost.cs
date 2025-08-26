@@ -11,6 +11,11 @@ public class ScriptHost(App app)
         MessageBox.Show(message);
     }
 
+    public void ShowNotification(string message)
+    {
+        ShowMessageBox(message);
+    }
+
     public int GetMonitorCount()
     {
         return WindowApiHelper.GetSystemMetrics(WindowApiHelper.SM_CMONITORS);
