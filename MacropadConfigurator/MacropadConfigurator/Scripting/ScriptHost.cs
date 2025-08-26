@@ -1,6 +1,8 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Windows;
+using CommunityToolkit.Mvvm.Messaging;
+using MacropadConfigurator.Messages;
 
 namespace MacropadConfigurator.Scripting;
 
@@ -13,7 +15,7 @@ public class ScriptHost(App app)
 
     public void ShowNotification(string message)
     {
-        ShowMessageBox(message);
+        WeakReferenceMessenger.Default.Send(new ShowToastMessage(message));
     }
 
     public int GetMonitorCount()

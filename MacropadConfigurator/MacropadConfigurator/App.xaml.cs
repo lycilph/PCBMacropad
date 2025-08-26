@@ -61,13 +61,13 @@ public partial class App : Application
 
         CheckForSingleInstance();
 
-        // Initialize application
-        var applicationManager = Services.GetRequiredService<ApplicationService>();
-        applicationManager.Start();
-
         // Initialize the NotifyIcon
         notifyIcon = (TaskbarIcon)FindResource("NotifyIcon");
         notifyIcon.DataContext = new NotifyIconViewModel(this);
+
+        // Initialize application
+        var applicationManager = Services.GetRequiredService<ApplicationService>();
+        applicationManager.Start(notifyIcon);
 
         // Initialize main window
         var vm = Services.GetRequiredService<ShellViewModel>();

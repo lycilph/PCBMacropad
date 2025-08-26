@@ -2,12 +2,17 @@
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
+using Hardcodet.Wpf.TaskbarNotification;
 using MacropadConfigurator.Messages;
 using NLog;
 
 namespace MacropadConfigurator.Services;
 
-public class ApplicationService : ObservableRecipient, IRecipient<StartupMessage>, IRecipient<DataChangedMessage>
+public class ApplicationService 
+    : ObservableRecipient, 
+      IRecipient<StartupMessage>, 
+      IRecipient<DataChangedMessage>,
+      IRecipient<ShowToastMessage>
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
@@ -21,6 +26,8 @@ public class ApplicationService : ObservableRecipient, IRecipient<StartupMessage
     private readonly ConfigurationService configurationService;
 
     private readonly KeyboardHook keyboardHook;
+
+    private TaskbarIcon? notifyIcon = null;
 
     public ApplicationService(SettingsService settingsService,
                               ScriptService scriptService,
@@ -52,8 +59,10 @@ public class ApplicationService : ObservableRecipient, IRecipient<StartupMessage
         await scriptService.UpdateStateAsync(configurationService.Current.MasterScript.Script);
     }
 
-    public void Start()
+    public void Start(TaskbarIcon notifyIcon)
     {
+        this.notifyIcon = notifyIcon;
+
         settingsService.Load(GetPath(settingsFile));
         configurationService.Load(GetPath(shortcutsFile));
 
@@ -107,6 +116,11 @@ public class ApplicationService : ObservableRecipient, IRecipient<StartupMessage
         SaveData();
     }
 
+    public void Receive(ShowToastMessage message)
+    {
+        notifyIcon?.ShowBalloonTip("Information", message.Text, BalloonIcon.Info);
+    }
+    
     private void CreateShortcut()
     {
         var startupFolder = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
