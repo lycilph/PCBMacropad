@@ -1,0 +1,20 @@
+# Path to SoundVolumeView (commandline version)
+$svvPath = ".\3rdParty\svcl.exe"
+
+# Export all devices to CSV
+$csvPath = "$env:TEMP\svv_devices.csv"
+& $svvPath /scomma $csvPath
+
+# Read CSV
+$devices = Import-Csv $csvPath
+
+# Filter only active output devices
+$activeOutput = $devices | Where-Object { 
+    $_.Type -eq "Device" -and $_."Device State" -eq "Active"
+}
+
+# Output names
+$activeOutput | ForEach-Object { $_.Name }
+
+# Clean up
+Remove-Item $csvPath

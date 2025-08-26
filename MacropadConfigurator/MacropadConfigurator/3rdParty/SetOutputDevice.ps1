@@ -1,0 +1,10 @@
+﻿param(
+    [Parameter(Mandatory=$true)]
+    [string]$DeviceName
+)
+
+# Path to SoundVolumeView
+$svvPath = ".\3rdParty\svcl.exe"
+
+# Set the device as default (1 = all roles: console, multimedia, communications)
+& $svvPath /SetDefault "$DeviceName" 1

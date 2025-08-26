@@ -18,6 +18,77 @@ public class ScriptHost(App app)
         WeakReferenceMessenger.Default.Send(new ShowToastMessage(message));
     }
 
+    public string GetAllOutputDevices()
+    {
+        string psScriptPath = @"3rdParty\GetAllOutputDevices.ps1";
+        string output = string.Empty;
+
+        ProcessStartInfo startInfo = new ProcessStartInfo()
+        {
+            FileName = "powershell.exe",
+            Arguments = $"-NoProfile -ExecutionPolicy Bypass -File \"{psScriptPath}\"",
+            RedirectStandardOutput = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+
+        using (Process process = Process.Start(startInfo))
+        {
+            output = process.StandardOutput.ReadToEnd();
+            process.WaitForExit();
+        }
+
+        return output;
+    }
+
+    public void SetCurrentOutputDevice(string device_name)
+    {
+        string psScriptPath = @"3rdParty\SetOutputDevice.ps1";
+
+        ProcessStartInfo startInfo = new ProcessStartInfo()
+        {
+            FileName = "powershell.exe",
+            Arguments = $"-NoProfile -ExecutionPolicy Bypass -File \"{psScriptPath}\" -DeviceName \"{device_name}\"",
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+
+        using (Process process = Process.Start(startInfo))
+        {
+            var output = process.StandardOutput.ReadToEnd();
+            var error = process.StandardError.ReadToEnd();
+            process.WaitForExit();
+
+            if (!string.IsNullOrWhiteSpace(error))
+                ShowMessageBox("Error: " + error);
+        }
+    }
+
+    public string GetCurrentOutputDevice()
+    {
+        string psScriptPath = @"3rdParty\GetOutputDevice.ps1";
+        string output = string.Empty;
+
+        ProcessStartInfo startInfo = new ProcessStartInfo()
+        {
+            FileName = "powershell.exe",
+            Arguments = $"-NoProfile -ExecutionPolicy Bypass -File \"{psScriptPath}\"",
+            RedirectStandardOutput = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+
+        using (Process process = Process.Start(startInfo))
+        {
+            output = process.StandardOutput.ReadToEnd();
+            process.WaitForExit();
+        }
+
+        return output;
+    }
+
     public int GetMonitorCount()
     {
         return WindowApiHelper.GetSystemMetrics(WindowApiHelper.SM_CMONITORS);

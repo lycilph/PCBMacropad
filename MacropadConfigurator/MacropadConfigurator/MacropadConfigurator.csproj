@@ -39,4 +39,19 @@
     <Resource Include="Assets\ApplicationIcon.png" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="3rdParty\GetAllOutputDevices.ps1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="3rdParty\GetOutputDevice.ps1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="3rdParty\SetOutputDevice.ps1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="3rdParty\svcl.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
