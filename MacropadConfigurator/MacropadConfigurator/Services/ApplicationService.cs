@@ -99,7 +99,7 @@ public class ApplicationService
             .ForEach(async s =>
             {
                 logger.Trace($"[{arg1} - {arg2}] was pressed - Triggering shortcut [{s.Text}]");
-                await scriptService.RunAsync(s.Script);
+                await scriptService.RunOnUIThreadAsync(s.Script);
             });
     }
 

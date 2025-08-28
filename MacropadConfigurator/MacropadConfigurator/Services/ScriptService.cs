@@ -43,6 +43,33 @@ public class ScriptService
         }
     }
 
+    public Task RunOnUIThreadAsync(string script)
+    {
+        var dispatcher = Application.Current?.Dispatcher;
+        if (dispatcher == null || dispatcher.CheckAccess())
+        {
+            // Already on UI thread
+            return RunAsync(script);
+        }
+        else
+        {
+            var tcs = new TaskCompletionSource<object?>();
+            dispatcher.BeginInvoke(new Action(async () =>
+            {
+                try
+                {
+                    await RunAsync(script);
+                    tcs.SetResult(null);
+                }
+                catch (Exception ex)
+                {
+                    tcs.SetException(ex);
+                }
+            }));
+            return tcs.Task;
+        }
+    }
+
     public async Task UpdateStateAsync(string script)
     {
         state = await CSharpScript.RunAsync(script, options, host, globalsType: typeof(ScriptHost));

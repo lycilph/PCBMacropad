@@ -115,9 +115,14 @@ public class ScriptHost(App app)
         }
     }
 
-    public Process Run(string path)
+    public Process? Run(string path, bool useShellExecute = true)
     {
-        return Process.Start(path);
+        var info = new ProcessStartInfo(path) { UseShellExecute = useShellExecute };
+
+        if (info == null)
+            throw new ArgumentException($"Cannot run [{path}]");
+        else
+            return Process.Start(info);
     }
 
     public bool WindowExist(string path)

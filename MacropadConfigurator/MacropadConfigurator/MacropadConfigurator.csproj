@@ -10,12 +10,28 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="3rdParty\GetAllOutputDevices.ps1" />
+    <None Remove="3rdParty\GetOutputDevice.ps1" />
+    <None Remove="3rdParty\SetOutputDevice.ps1" />
+    <None Remove="3rdParty\svcl.exe" />
     <None Remove="Assets\ApplicationIcon.ico" />
     <None Remove="Assets\ApplicationIcon.png" />
     <None Remove="NLog.config" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="3rdParty\GetAllOutputDevices.ps1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="3rdParty\GetOutputDevice.ps1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="3rdParty\SetOutputDevice.ps1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="3rdParty\svcl.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -37,21 +53,6 @@
   <ItemGroup>
     <Resource Include="Assets\ApplicationIcon.ico" />
     <Resource Include="Assets\ApplicationIcon.png" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="3rdParty\GetAllOutputDevices.ps1">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="3rdParty\GetOutputDevice.ps1">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="3rdParty\SetOutputDevice.ps1">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="3rdParty\svcl.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>
