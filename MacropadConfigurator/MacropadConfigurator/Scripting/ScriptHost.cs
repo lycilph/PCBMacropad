@@ -115,14 +115,41 @@ public class ScriptHost(App app)
         }
     }
 
-    public Process? Run(string path, bool useShellExecute = true)
+    public async Task<Process?> Run(
+        string path,
+        bool useShellExecute = true,
+        bool setForeground = false,
+        int foregroundTimeoutMs = 5000)
     {
-        var info = new ProcessStartInfo(path) { UseShellExecute = useShellExecute };
+        var proc = Process.Start(new ProcessStartInfo(path) { UseShellExecute = useShellExecute })
+                 ?? throw new ArgumentException($"Cannot run [{path}]");
 
-        if (info == null)
-            throw new ArgumentException($"Cannot run [{path}]");
-        else
-            return Process.Start(info);
+        if (setForeground)
+        {
+            try
+            {
+                // Allow the launched process to become foreground
+                WindowApiHelper.AllowSetForegroundWindow(proc.Id);
+
+                var sw = Stopwatch.StartNew();
+                while (sw.ElapsedMilliseconds < foregroundTimeoutMs)
+                {
+                    proc.Refresh(); // updates MainWindowHandle
+                    if (proc.MainWindowHandle != IntPtr.Zero)
+                    {
+                        WindowApiHelper.SetForegroundWindow(proc.MainWindowHandle);
+                        break;
+                    }
+                    await Task.Delay(100); // async wait instead of Thread.Sleep
+                }
+            }
+            catch
+            {
+                // Swallow errors to avoid crashing scripts
+            }
+        }
+
+        return proc;
     }
 
     public bool WindowExist(string path)
