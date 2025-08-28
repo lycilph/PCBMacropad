@@ -180,8 +180,8 @@ DocProject/Help/*.hhp
 DocProject/Help/Html2
 DocProject/Help/html
 
-# Click-Once directory
-publish/
+# Click-Once directory (including now as seen here: https://blog.200-ok.com/posts/how-to-host-a-clickonce-installer-on-github/)
+#publish/
 
 # Publish Web Output
 *.[Pp]ublish.xml

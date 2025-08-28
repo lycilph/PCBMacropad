@@ -1,2 +1,7 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Found this here: https://blog.200-ok.com/posts/how-to-host-a-clickonce-installer-on-github/
+*.manifest binary
+*.application binary
+*.deploy binary
